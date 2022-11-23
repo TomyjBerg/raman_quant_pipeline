@@ -1,12 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-import walk
-
-folder_path = 'C:\Users\thoma\Desktop\Master Thesis\Master\Mile 3\221107_Bertho01-CDW3'
-#sample_overview = pd.read_excel(folder_path + "\221107_Bertho01-CDW3", sheet_name="Samples")
-delete_experiment = []
-
+from os import walk
 
 
 def list_files(mpath):
@@ -27,5 +22,7 @@ def list_files_2D(mpath,delete_):
       files_2d.append(f)
   return(files_2d)
 
-print('hey')
-print(list_files_2D(folder_path,delete_experiment))
+def get_spectra_files(mpath,delete):
+    files_names =list_files_2D(mpath,delete)
+    spectra_files = [pd.read_csv(mpath + '/' + f, sep="\t", header=None, decimal=",") for f in files_names]
+    return spectra_files

@@ -7,6 +7,16 @@ import pybaselines.morphological as pymorph
 import pybaselines.smooth as pysmooth
 from scipy.signal import savgol_filter
 
+##### CROPPING #####
+
+def crop_file(f, shift_lim):
+    
+    cropped_f = f[f[0]>=shift_lim[0]]
+    cropped_f = cropped_f[cropped_f[0]<=shift_lim[1]]
+
+    return cropped_f
+
+
 
 ##### SMOOTHING #####
 
