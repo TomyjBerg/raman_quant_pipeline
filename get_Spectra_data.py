@@ -25,4 +25,4 @@ def list_files_2D(mpath,delete_):
 def get_spectra_files(mpath,delete):
     files_names =list_files_2D(mpath,delete)
     spectra_files = [pd.read_csv(mpath + '/' + f, sep="\t", header=None, decimal=",") for f in files_names]
-    return spectra_files
+    return spectra_files,files_names
