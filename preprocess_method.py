@@ -212,7 +212,7 @@ def airpls(y,lambda_air,m_order):
 
 def asls(y,lamda_as,penalty_as,m_order_as):
     """Perform baseline correction of data by applying an asymetric least squares (asls) 
-        for baseline fiiting using the airpls function from the pybaseline package
+        for baseline fiiting using the asls function from the pybaseline package
 
     Parameters
     ----------
@@ -252,8 +252,8 @@ def asls(y,lamda_as,penalty_as,m_order_as):
 
 
 def arpls(y,lambda_ar,m_order_ar):
-    """Perform baseline correction of data by applying an asymetric reweighted penalized least squares (asls) 
-        for baseline fiiting using the airpls function from the pybaseline package
+    """Perform baseline correction of data by applying an asymetric reweighted penalized least squares (arpls) 
+        for baseline fiiting using the arpls function from the pybaseline package
 
     Parameters
     ----------
@@ -291,7 +291,7 @@ def arpls(y,lambda_ar,m_order_ar):
 
 def aspls(y,lamda_aspls,m_order_aspls):
     """Perform baseline correction of data by applying an adaptative smoothness penalized least squares(aspls) 
-        for baseline fiiting using the airpls function from the pybaseline package
+        for baseline fiiting using the aspls function from the pybaseline package
 
     Parameters
     ----------
@@ -330,7 +330,7 @@ def aspls(y,lamda_aspls,m_order_aspls):
 
 def drpls(y,lamda_dr,eta_dr,m_order_dr):
     """Perform baseline correction of data by applying an doubly reweighted penalized least squares (drpls) 
-        for baseline fiiting using the airpls function from the pybaseline package
+        for baseline fiiting using the drpls function from the pybaseline package
 
     Parameters
     ----------
@@ -371,7 +371,7 @@ def drpls(y,lamda_dr,eta_dr,m_order_dr):
 
 def improve_arpls(y,lamda_iar,m_order_iar,max_iter_iar):
     """Perform baseline correction of data by applying an improve asymmetrical reweighted 
-        penalized least squares (iarpls) for baseline fiiting using the airpls function 
+        penalized least squares (iarpls) for baseline fiiting using the iarpls function 
         from the pybaseline package
 
     Parameters
@@ -412,7 +412,7 @@ def improve_arpls(y,lamda_iar,m_order_iar,max_iter_iar):
 
 def improve_asls(y,lamda_ias,penalty_ias,lamdaDer1_ias,max_iter_ias):
     """Perform baseline correction of data by applying an improve asymmetrical least squares (iasls) 
-        for baseline fiiting using the airpls function from the pybaseline package
+        for baseline fiiting using the iasls function from the pybaseline package
 
     Parameters
     ----------
@@ -447,7 +447,7 @@ def improve_asls(y,lamda_ias,penalty_ias,lamdaDer1_ias,max_iter_ias):
     line = y[0]
     data = y[1]
     x = np.array(y[1])
-    ba, param = pywh.iasls(x,lam=lamda_ias,p=penalty_ias,lam_1=lamda_ias,max_iter=max_iter_ias)
+    ba, param = pywh.iasls(x,lam=lamda_ias,p=penalty_ias,lam_1=lamdaDer1_ias,max_iter=max_iter_ias)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
@@ -455,153 +455,515 @@ def improve_asls(y,lamda_ias,penalty_ias,lamdaDer1_ias,max_iter_ias):
 
 #Polynomial Method
 
-def normal_poly(y,p_order):
-    """Apply polynimoal basline correction.
-    
+def normal_poly(y,normpoly_order):
+    """Perform baseline correction of data by computing a polynomial that fits 
+    the baseline of the data by the "poly" function from the pybaseline package
+
     Parameters
     ----------
-    y : pandas DataFrame
-    p_order: int
-
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    normpoly_order : int
+        The polynomial order for fitting the baseline.
+        
     Returns
     -------
-    z : pandas DataFrame
-        Baseline corrected data.
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    
+        
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
     index_y =  y.index
     line = y[0]
     data = y[1]
     k = np.array(y[0])
     x = np.array(y[1])
-    ba, param = pypoly.poly(x,k,p_order)
+    ba, param = pypoly.poly(x,k,normpoly_order)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
-def mod_poly(y,p_order):
+def mod_poly(y,modpoly_order):
+    """Perform baseline correction of data by computing a modified polynomial that fits 
+    the baseline of the data by the "modpoly" function from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    modpoly_order : int
+        The polynomial order for fitting the baseline.
+    
+    
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    
+        
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
     index_y =  y.index
     line = y[0]
     data = y[1]
     k = np.array(y[0])
     x = np.array(y[1])
-    ba, param = pypoly.modpoly(x,k,p_order)
-    z = data-ba
-    z = pd.DataFrame(z,index = index_y, columns = [1])
-    z = pd.concat([line, z],axis =1,ignore_index = False)
-    return z
-
-
-def improve_mod_poly(y,p_order):
-    index_y =  y.index
-    line = y[0]
-    data = y[1]
-    k = np.array(y[0])
-    x = np.array(y[1])
-    ba, param = pypoly.imodpoly(x,k,p_order)
-    z = data-ba
-    z = pd.DataFrame(z,index = index_y, columns = [1])
-    z = pd.concat([line, z],axis =1,ignore_index = False)
-    return z
-
-def penalized_poly(y,p_order):
-    index_y =  y.index
-    line = y[0]
-    data = y[1]
-    k = np.array(y[0])
-    x = np.array(y[1])
-    ba, param = pypoly.penalized_poly(x,k,p_order)
-    z = data-ba
-    z = pd.DataFrame(z,index = index_y, columns = [1])
-    z = pd.concat([line, z],axis =1,ignore_index = False)
-    return z
-
-
-def quantile_poly(y,p_order,q):
-    index_y =  y.index
-    line = y[0]
-    data = y[1]
-    k = np.array(y[0])
-    x = np.array(y[1])
-    ba, param = pypoly.quant_reg(x,k,p_order,q)
+    ba, param = pypoly.modpoly(x,k,modpoly_order)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
 
-#Spline Method
+def improve_mod_poly(y,imodpoly_order):
+    """Perform baseline correction of data by computing an improved modified polynomial that fits 
+    the baseline of the data by the "imodpoly" function from the pybaseline package
 
-def quantile_spline(y,lam,q,knots,spline_deg,m_order):
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    imodpoly_order : int
+        The polynomial order for fitting the baseline.
+        
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
     index_y =  y.index
     line = y[0]
     data = y[1]
     k = np.array(y[0])
     x = np.array(y[1])
-    ba, param = pyspline.irsqr(x,lam,q,knots,spline_deg,m_order,x_data = k)
+    ba, param = pypoly.imodpoly(x,k,imodpoly_order)
+    z = data-ba
+    z = pd.DataFrame(z,index = index_y, columns = [1])
+    z = pd.concat([line, z],axis =1,ignore_index = False)
+    return z
+
+def penalized_poly(y,penpoly_order):
+    """Perform baseline correction of data by computing a polynomial that fits 
+    the baseline using a non-quadratic cost function. This algorithm use the "penalized_poly" function 
+    from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    penpoly_order : int
+        The polynomial order for fitting the baseline.
+        
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
+    index_y =  y.index
+    line = y[0]
+    data = y[1]
+    k = np.array(y[0])
+    x = np.array(y[1])
+    ba, param = pypoly.penalized_poly(x,k,penpoly_order)
+    z = data-ba
+    z = pd.DataFrame(z,index = index_y, columns = [1])
+    z = pd.concat([line, z],axis =1,ignore_index = False)
+    return z
+
+def quantile_poly(y,qpoly_order,poly_quantile):
+    """Perform baseline correction of data by computing a polynomial that fits 
+    the baseline using a quantile regression. This algorithm use the "quant_reg" function 
+    from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    qpoly_order : int
+        The polynomial order for fitting the baseline.
+
+    poly_quantile : float
+        The quantile at which to fit the baseline
+
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
+    index_y =  y.index
+    line = y[0]
+    data = y[1]
+    k = np.array(y[0])
+    x = np.array(y[1])
+    ba, param = pypoly.quant_reg(x,k,qpoly_order,poly_quantile)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
 
-def spline_airpls(y,lam,knots,spline_deg,m_order):
+# Spline Method
+
+def quantile_spline(y,lamda_irsqr,quantile_irsqr,knots_irsqr,spline_deg_irsqr,m_order_irsqr):
+    """Perform baseline correction of data by applying an Iterative Reweighted Spline 
+        Quantile Regression (IRSQR) for the baseline fiiting using the "irsqr" function 
+        from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    lambda_irsqr: float
+        The smoothing parameter. Larger values will create smoother baselines
+
+    quantile_irsqr : float
+        The quantile at which to fit the baseline
+
+    knots_irsqr : int
+        The number of knots for the spline
+
+    spline_deg_irsqr : int
+        The degree of the spline (libear,cubic,quadratic)
+
+    m_order_irsqr : int
+        The ordrer of the differential matrix
+
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
     index_y =  y.index
     line = y[0]
     data = y[1]
     k = np.array(y[0])
     x = np.array(y[1])
-    ba, param = pyspline.pspline_airpls(x,lam,knots,spline_deg,m_order,x_data = k)
+    ba, param = pyspline.irsqr(x,lamda_irsqr,quantile_irsqr,knots_irsqr,spline_deg_irsqr,m_order_irsqr,x_data = k)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
 
-def spline_asls(y,lam,p,knots,spline_deg,m_order):
+def spline_airpls(y,lamda_spline_air,knots_air,spline_deg_air,m_order_spline_air):
+    """Perform baseline correction of data by applying a penalized spline version of the
+        Adaptive iteratively reweighted penalized least squares (airPLS) for the baseline fiiting 
+        using the "pspline_airpls" function from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    lambda_spline_air: float
+        The smoothing parameter. Larger values will create smoother baselines
+
+    knots_air : int
+        The number of knots for the spline
+
+    spline_air: int
+        The degree of the spline (libear,cubic,quadratic)
+
+    m_order_spline_air : int
+        The ordrer of the differential matrix
+    
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
     index_y =  y.index
     line = y[0]
     data = y[1]
     k = np.array(y[0])
     x = np.array(y[1])
-    ba, param = pyspline.pspline_asls(x,lam,p,knots,spline_deg,m_order,x_data = k)
+    ba, param = pyspline.pspline_airpls(x,lamda_spline_air,knots_air,spline_deg_air,m_order_spline_air,x_data = k)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
 
-def spline_arpls(y,lam,knots,spline_deg,m_order):
+def spline_asls(y,lamda_spline_asls,penalty_spline_asls,knots_asls,spline_deg_asls,m_order_spline_asls):
+    """Perform baseline correction of data by applying a penalized spline version of the
+        asymmetric least squares(AsLS) algorithm for the baseline fiiting 
+        using the "pspline_asls" function from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    lambda_spline_asls: float
+        The smoothing parameter. Larger values will create smoother baselines
+
+    penalty_spline_asls : float
+        The penalizing weighting factor. Must be between 0 and 1.
+
+    knots_asls : int
+        The number of knots for the spline
+
+    spline_asls: int
+        The degree of the spline (libear,cubic,quadratic)
+
+    m_order_spline_asls : int
+        The ordrer of the differential matrix
+    
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
     index_y =  y.index
     line = y[0]
     data = y[1]
     k = np.array(y[0])
     x = np.array(y[1])
-    ba, param = pyspline.pspline_arpls(x,lam,knots,spline_deg,m_order,x_data = k)
+    ba, param = pyspline.pspline_asls(x,lamda_spline_asls,penalty_spline_asls,knots_asls,spline_deg_asls,m_order_spline_asls,x_data = k)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
-def improve_spline_arpls(y,lam,knots,spline_deg,m_order,max_iter):
+
+def spline_arpls(y,lamda_spline_ar,knots_ar,spline_deg_ar,m_order_spline_ar):
+    """Perform baseline correction of data by applying a penalized spline version of the
+        Asymmetrically reweighted penalized least squares smoothing (arPLS) algorithm 
+        for the baseline fiiting using the "pspline_arpls" function from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    lambda_spline_ar: float
+        The smoothing parameter. Larger values will create smoother baselines
+
+    knots_ar : int
+        The number of knots for the spline
+
+    spline_ar: int
+        The degree of the spline (libear,cubic,quadratic)
+
+    m_order_spline_ar : int
+        The ordrer of the differential matrix
+    
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
     index_y =  y.index
     line = y[0]
     data = y[1]
     k = np.array(y[0])
     x = np.array(y[1])
-    ba, param = pyspline.pspline_iarpls(x,lam,knots,spline_deg,m_order,x_data = k,max_iter =max_iter)
+    ba, param = pyspline.pspline_arpls(x,lamda_spline_ar,knots_ar,spline_deg_ar,m_order_spline_ar,x_data = k)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
-def improve_spline_asls(y,lam,p,lam1,knots,spline_deg,max_iter):
+def improve_spline_arpls(y,lamda_spline_iar,knots_iar,spline_deg_iar,m_order_spline_iar,max_iter_spline_iar):
+    """Perform baseline correction of data by applying a penalized spline version of the
+        Improved asymmetrically reweighted penalized least squares smoothing (IarPLS) algorithm 
+        for the baseline fiiting using the "pspline_arpls" function from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    lambda_spline_iar: float
+        The smoothing parameter. Larger values will create smoother baselines
+
+    knots_iar : int
+        The number of knots for the spline
+
+    spline_iar: int
+        The degree of the spline (libear,cubic,quadratic)
+
+    m_order_spline_iar : int
+        The ordrer of the differential matrix
+    
+    max_iter_spline_iar : int
+        The max number of fit iterations
+
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
     index_y =  y.index
     line = y[0]
     data = y[1]
     k = np.array(y[0])
     x = np.array(y[1])
-    ba, param = pyspline.pspline_iasls(x,k,lam,p,lam1,knots,spline_deg,max_iter =max_iter)
+    ba, param = pyspline.pspline_iarpls(x,lamda_spline_iar,knots_iar,spline_deg_iar,m_order_spline_iar,
+                                        x_data = k,max_iter =max_iter_spline_iar)
+    z = data-ba
+    z = pd.DataFrame(z,index = index_y, columns = [1])
+    z = pd.concat([line, z],axis =1,ignore_index = False)
+    return z
+
+def improve_spline_asls(y,lamda_spline_ias,penalty_spline_ias,lamdaDer1_spline_ias,knots_ias,spline_deg_ias,
+    max_iter_spline_ias):
+    """Perform baseline correction of data by applying a penalized spline version of the
+        Fits the baseline using the improved asymmetric least squares (IAsLS) algorithm 
+        for the baseline fiiting using the "pspline_arpls" function from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+    
+    lambda_spline_ias : float
+        The smoothing parameter, Larger values will create smoother baselines.
+
+    penalty_spline_ias : 
+        The penalizing weighting factor. Must be between 0 and 1.
+
+    lamdaDer1_spline_ias :
+        The smoothing parameter for the first derivative of the residual
+
+    knots_ias : int
+        The number of knots for the spline
+
+    spline_deg_ias: int
+        The degree of the spline (libear,cubic,quadratic)
+    
+    max_iter_spline_ias : int
+        The max number of fit iterations
+
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
+    index_y =  y.index
+    line = y[0]
+    data = y[1]
+    k = np.array(y[0])
+    x = np.array(y[1])
+    ba, param = pyspline.pspline_iasls(x,k,lamda_spline_ias,penalty_spline_ias,lamdaDer1_spline_ias,
+                                        knots_ias,spline_deg_ias,max_iter =max_iter_spline_ias)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
@@ -609,13 +971,42 @@ def improve_spline_asls(y,lam,p,lam1,knots,spline_deg,max_iter):
 
 #Morphological Approach
 
-def amormol(y,window):
+
+
+def amormol(y,half_window_amormol):
+    """Perform baseline correction of data by applying an iteratively averaging morphological 
+        and mollified (aMorMol) for the baseline fiiting using the "amormol" function 
+        from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+
+    half_window_amormol : int
+        The half-window used for the morphology functions
+
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
     index_y =  y.index
     line = y[0]
     data = y[1]
     k = np.array(y[0])
     x = np.array(y[1])
-    ba, param = pymorph.amormol(x,window)
+    ba, param = pymorph.amormol(x,half_window_amormol)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
@@ -623,13 +1014,41 @@ def amormol(y,window):
 
 #Statistic Sensitive method
 
-def snip(y,window):
+def snip(y,max_half_window_snip):
+    """Perform baseline correction of data by applying a Statistics-sensitive Non-linear 
+        Iterative Peak-clipping (SNIP) for the baseline fiiting using the "snip" function 
+        from the pybaseline package
+
+    Parameters
+    ----------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity with baseline to be removed
+
+    max_half_window_snip : int
+        The maximum number of iterations. Should be set such that max_half_window is approxiamtely 
+        (w-1)/2, where w is the index-based width of a feature or peak. 
+
+    Returns
+    -------
+    y : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity without baseline
+    
+    References
+    ----------
+    Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
+        preprocessing strategies of the basis of the ability to refine the 
+        relationship between variance components
+
+    pybaseline package litterature : https://pybaselines.readthedocs.io/
+    """
     index_y =  y.index
     line = y[0]
     data = y[1]
     k = np.array(y[0])
     x = np.array(y[1])
-    ba, param = pysmooth.snip(x,window)
+    ba, param = pysmooth.snip(x,max_half_window_snip)
     z = data-ba
     z = pd.DataFrame(z,index = index_y, columns = [1])
     z = pd.concat([line, z],axis =1,ignore_index = False)
@@ -638,11 +1057,30 @@ def snip(y,window):
 ######## NORMALIZATION #############
 
 def msc(input_datas, replicant,reference=None):
-    """
-        :msc: Scatter Correction technique performed with mean of the sample data as the reference.
-        :param input_data: Array of spectral data
-        :type input_data: DataFrame
-        :returns: data_msc (ndarray): Scatter corrected spectra data
+    """Scatter Correction technique performed with mean of the sample data as the reference.
+
+    Parameters
+    ----------
+    input_datas : Array like of pandas dataframe (y) (order by the name of the sample)
+                    [0] = raman_shift 
+                    [1] = intensity to be 
+        List of the raman spectra dataframe to be normalized
+    
+    replicants : int
+        Number of replication measurement
+
+    reference : panda dataframe (Default is None)
+        [0] = raman_shift 
+        [1] = intensity
+        Reference spectra for the normalization ("BlanK")
+
+
+    Returns
+    -------
+    output_data : Array like of pandas dataframe
+                    [0] = raman_shift 
+                    [1] = intensity normalized
+        List of spectra dataframe normalized
     """
     comb = []
     input_data = []
@@ -690,14 +1128,23 @@ def msc(input_datas, replicant,reference=None):
 
 
 def snv(input_datas):
-    """
-        :snv: A correction technique which is done on each
-        individual spectrum, a reference spectrum is not
-        required
-        :param input_data: Array of spectral data
-        :type input_data: DataFrame
-        
-        :returns: data_snv (ndarray): Scatter corrected spectra
+    """ Perform Normalization technique using the Standard Normal Variate (SNV) algorithm 
+        which is done on each individual spectrum, a reference spectrum is not required
+
+    Parameters
+    ----------
+    input_datas : Array like of pandas dataframe (y) (order by the name of the sample)
+                    [0] = raman_shift 
+                    [1] = intensity to be 
+        List of the raman spectra dataframe to be normalized
+
+
+    Returns
+    -------
+    output_data : Array like of pandas dataframe
+                    [0] = raman_shift 
+                    [1] = intensity normalized
+        List of spectra dataframe normalized
     """
 
     comb = []
