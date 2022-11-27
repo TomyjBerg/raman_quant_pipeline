@@ -100,6 +100,7 @@ def evaluate(files_names,files,same_sample,replicants):
 
 def perform_smoothing(cropped_files,a1,allele):
     param = allele[:-1]
+    print(param)
     if a1  == 1:
         smoothed_data =  [preprocess.whittaker_smoother(d, param[0], param[1]) for d in cropped_files]
     elif a1 == 2:
@@ -114,21 +115,21 @@ def perform_baseline(smoothed_data,a2,allele):
     if a2 == 0:
         base_data = [d for d in smoothed_data]
     elif a2 == 1:
-        base_data =  [preprocess.perform_baseline_correction(d, param[0], param[1], param[2]) for d in smoothed_data]
+        base_data =  [preprocess.perform_baseline_correction(d, param[0], param[1]) for d in smoothed_data]
     elif a2 == 2:
-        base_data =  [preprocess.asls(d, param[0], param[1], param[2]) for d in smoothed_data]
+        base_data =  [preprocess.asls(d, param[0], param[1]) for d in smoothed_data]
     elif a2 == 3:
-        base_data =  [preprocess.airpls(d,param[0], param[1]) for d in smoothed_data]
+        base_data =  [preprocess.airpls(d,param[0]) for d in smoothed_data]
     elif a2 == 4:
-        base_data =  [preprocess.arpls(d,param[0], param[1]) for d in smoothed_data]
+        base_data =  [preprocess.arpls(d,param[0]) for d in smoothed_data]
     elif a2 == 5:
-        base_data =  [preprocess.aspls(d,param[0], param[1]) for d in smoothed_data]
+        base_data =  [preprocess.aspls(d,param[0]) for d in smoothed_data]
     elif a2 == 6:
-        base_data =  [preprocess.drpls(d, param[0], param[1],param[2]) for d in smoothed_data]
+        base_data =  [preprocess.drpls(d, param[0], param[1]) for d in smoothed_data]
     elif a2 == 7:
-        base_data =  [preprocess.improve_arpls(d,param[0], param[1],max_iter=param[2]) for d in smoothed_data]
+        base_data =  [preprocess.improve_arpls(d,param[0]) for d in smoothed_data]
     elif a2 == 8:
-        base_data =  [preprocess.improve_asls(d,param[0], param[1],param[2],max_iter=param[3]) for d in smoothed_data]
+        base_data =  [preprocess.improve_asls(d,param[0], param[1],param[2]) for d in smoothed_data]
     elif a2 == 9:
         base_data =  [preprocess.normal_poly(d,param[0]) for d in smoothed_data]
     elif a2 == 10:
@@ -140,17 +141,17 @@ def perform_baseline(smoothed_data,a2,allele):
     elif a2 == 13:
         base_data =  [preprocess.quantile_poly(d,param[0],param[1]) for d in smoothed_data]
     elif a2 == 14:
-        base_data =  [preprocess.quantile_spline(d,param[0],param[1],param[2],param[3],param[4]) for d in smoothed_data]
+        base_data =  [preprocess.quantile_spline(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
     elif a2 == 15:
-        base_data =  [preprocess.spline_airpls(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
+        base_data =  [preprocess.spline_airpls(d,param[0],param[1],param[2]) for d in smoothed_data]
     elif a2 == 16:
-        base_data =  [preprocess.spline_arpls(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
+        base_data =  [preprocess.spline_arpls(d,param[0],param[1],param[2]) for d in smoothed_data]
     elif a2 == 17:
-        base_data =  [preprocess.spline_asls(d,param[0],param[1],param[2],param[3],param[4]) for d in smoothed_data]
+        base_data =  [preprocess.spline_asls(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
     elif a2 == 18:
-        base_data =  [preprocess.improve_spline_arpls(d,param[0],param[1],param[2],param[3],param[4]) for d in smoothed_data]
+        base_data =  [preprocess.improve_spline_arpls(d,param[0],param[1],param[2]) for d in smoothed_data]
     elif a2 == 19:
-        base_data =  [preprocess.improve_spline_asls(d,param[0],param[1],param[2],param[3],param[4],param[5]) for d in smoothed_data]
+        base_data =  [preprocess.improve_spline_asls(d,param[0],param[1],param[2],param[3],param[4]) for d in smoothed_data]
     elif a2 == 20:
         base_data =  [preprocess.amormol(d,param[0]) for d in smoothed_data]
     else:

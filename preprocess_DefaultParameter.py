@@ -45,8 +45,9 @@ def get_default_smoothing():
     whittaker_smoother_degree_range = range(3,7)
 
 
-    allele_whittaker = whittaker_smoother_lambda_default,whittaker_smoother_degree_default,
-    [whittaker_smoother_lambda_range,whittaker_smoother_degree_range]
+    allele_whittaker = [whittaker_smoother_lambda_default,whittaker_smoother_degree_default,
+    [whittaker_smoother_lambda_range,whittaker_smoother_degree_range]]
+
 
     #### Savitzky Golay Filter ####
 
@@ -56,8 +57,8 @@ def get_default_smoothing():
     SG_filter_window_default = 11
     SG_filter_window_range  = range(9,31,2)
 
-    allele_SG = SG_filter_order_default,SG_filter_window_default,
-    [SG_filer_order_range,SG_filter_window_range]
+    allele_SG = [SG_filter_order_default,SG_filter_window_default,
+    [SG_filer_order_range,SG_filter_window_range]]
 
     ##
 
@@ -83,8 +84,8 @@ def get_default_baseline():
     penalty_whittaker_default = 0.075
     penalty_whittaker_range = np.arange(0.005,0.080,0.005)
       
-    allele_asymetric_whittaker = whittaker_base_lambda_default,penalty_whittaker_default,
-    [whittaker_base_lambda_range,penalty_whittaker_range]
+    allele_asymetric_whittaker = [whittaker_base_lambda_default,penalty_whittaker_default,
+    [whittaker_base_lambda_range,penalty_whittaker_range]]
 
     #### AirPLS ####
 

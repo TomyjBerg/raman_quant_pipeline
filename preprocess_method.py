@@ -890,8 +890,7 @@ def improve_spline_arpls(y,lambda_spline_iar,knots_iar,spline_deg_iar):
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
-def improve_spline_asls(y,lambda_spline_ias,penalty_spline_ias,lambdaDer1_spline_ias,knots_ias,spline_deg_ias,
-    max_iter_spline_ias):
+def improve_spline_asls(y,lambda_spline_ias,penalty_spline_ias,lambdaDer1_spline_ias,knots_ias,spline_deg_ias):
     """Perform baseline correction of data by applying a penalized spline version of the
         Fits the baseline using the improved asymmetric least squares (IAsLS) algorithm 
         for the baseline fiiting using the "pspline_arpls" function from the pybaseline package
