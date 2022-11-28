@@ -9,6 +9,25 @@ import copy
 import random
 
 def get_w(files_names,files):
+    """Calculate the variance within each replication (Variance intra Sample).
+
+    Parameters
+    ----------
+
+    file_names : array of string
+        List of all the names corresponding to the raman spectra files 
+ 
+    files : array like of pandas dataframe
+        List of the spectra of the raman experiement (pandas dataframe)
+    
+    Returns
+    -------
+    w : float
+        Variance Intra Sample
+        i.e. Square of the (Sum of standard deviation of the 3 Principal Components over the replicants of each sample / 
+        number of sample in total)
+    """
+
     name_trip = []
     for f in files_names: 
         sh = f.find('_')
@@ -43,6 +62,30 @@ def get_w(files_names,files):
     return (std/len(name_trip))**2
       
 def get_b(files_names,files,same_sample,replicants):
+    """Calculate the variance within each sample (Variance inter Sample).
+
+    Parameters
+    ----------
+
+    file_names : array of string
+        List of all the names corresponding to the raman spectra files 
+ 
+    files : array like of pandas dataframe
+        List of the spectra of the raman experiement (pandas dataframe)
+    
+    same_sample : array of string
+        List of all the sample number (string) to ignore during the calcualtion
+        i.e. Differents sample with the same parameter of the experiment (DOE middle triplicants)
+
+    replicants : int
+        Number of replicants for each sample.
+    Returns
+    -------
+    w : float
+        Variance Inter Sample
+        i.e. Square of the (Sum of standard deviation of the 3 Principal Components over the samples for each replicants/ 
+        number of replicants)
+    """
     name_trip = []
     for f in files_names: 
         sh = f.find('_')
@@ -89,6 +132,29 @@ def get_b(files_names,files,same_sample,replicants):
     
 
 def evaluate(files_names,files,same_sample,replicants):
+    """Calculate the ratio b/w (variance between each sample (Variance inter Sample) over
+        the variance within each samples (Variance intra sample)).
+
+    Parameters
+    ----------
+
+    file_names : array of string
+        List of all the names corresponding to the raman spectra files 
+ 
+    files : array like of pandas dataframe
+        List of the spectra of the raman experiement (pandas dataframe)
+    
+    same_sample : array of string
+        List of all the sample number (string) to ignore during the calcualtion
+        i.e. Differents sample with the same parameter of the experiment (DOE middle triplicants)
+
+    replicants : int
+        Number of replicants for each sample.
+    Returns
+    -------
+    ratio : float
+        ratio of the variances inter/intra sample (b/w)
+    """
     b = get_b(files_names,files,same_sample,replicants)
     print(b)
     w = get_w(files_names,files)
@@ -98,71 +164,139 @@ def evaluate(files_names,files,same_sample,replicants):
 
 ####  PERFORM_PREPROCESS GA TEST #####
 
-def perform_smoothing(cropped_files,a1,allele):
-    param = allele[:-1]
+def perform_smoothing(cropped_files,index_smoothing_method,alleles_smoothing_parameters):
+    """Perform the smoothing of the cropped raman spectra using a specific method and parameters).
+
+    Parameters
+    ---------- 
+ 
+    cropped_files : array like of pandas dataframe
+        List of the spectra of the raman experiement after cropping (pandas dataframe)
+    
+    index_smoothing_method : int
+        index of the smoothing methods (1rt gene of the chromosome during GA optimization)
+
+    alleles_smoothing_parameters : array like
+        list of all the smoothing methods that are a list of parameters / range of parameter
+
+    Returns
+    -------
+    smoothed_data : array like of pandas dataframe
+        List of the spectra of the raman experiement after smoothing (pandas dataframe)
+    """
+    param = alleles_smoothing_parameters[:-1]
     print(param)
-    if a1  == 1:
+    if index_smoothing_method  == 1:
         smoothed_data =  [preprocess.whittaker_smoother(d, param[0], param[1]) for d in cropped_files]
-    elif a1 == 2:
+    elif index_smoothing_method == 2:
         smoothed_data =  [preprocess.sg_filter(d,param[0],param[1]) for d in cropped_files]
     else: 
         smoothed_data =  [d for d in cropped_files]
     return smoothed_data
 
-def perform_baseline(smoothed_data,a2,allele):
-    param = allele[:-1]
-    print(a2)
-    if a2 == 0:
+def perform_baseline(smoothed_data,index_baseline_method,alleles_baseline_parameters):
+    """Perform the baseline of the raman spectra using a specific method and parameters).
+
+    Parameters
+    ---------- 
+ 
+    smoothed_data : array like of pandas dataframe
+        List of the spectra of the raman experiement (pandas dataframe) after cropping 
+        and possibly the smoothing 
+    
+    index_baseline_method : int
+        index of the baseline correction methods (2nd gene of the chromosome during GA optimization)
+
+    alleles_baseline_parameters : array like
+        list of all the smoothing methods that are a list of parameters / range of parameter
+
+    Returns
+    -------
+    base_data : array like of pandas dataframe
+        List of the spectra of the raman experiement after baseline correction (pandas dataframe)
+    """
+    param = alleles_baseline_parameters[:-1]
+    print(index_baseline_method)
+    if index_baseline_method== 0:
         base_data = [d for d in smoothed_data]
-    elif a2 == 1:
+    elif index_baseline_method == 1:
         base_data =  [preprocess.perform_baseline_correction(d, param[0], param[1]) for d in smoothed_data]
-    elif a2 == 2:
+    elif index_baseline_method == 2:
         base_data =  [preprocess.asls(d, param[0], param[1]) for d in smoothed_data]
-    elif a2 == 3:
+    elif index_baseline_method == 3:
         base_data =  [preprocess.airpls(d,param[0]) for d in smoothed_data]
-    elif a2 == 4:
+    elif index_baseline_method == 4:
         base_data =  [preprocess.arpls(d,param[0]) for d in smoothed_data]
-    elif a2 == 5:
+    elif index_baseline_method == 5:
         base_data =  [preprocess.aspls(d,param[0]) for d in smoothed_data]
-    elif a2 == 6:
+    elif index_baseline_method == 6:
         base_data =  [preprocess.drpls(d, param[0], param[1]) for d in smoothed_data]
-    elif a2 == 7:
+    elif index_baseline_method == 7:
         base_data =  [preprocess.improve_arpls(d,param[0]) for d in smoothed_data]
-    elif a2 == 8:
+    elif index_baseline_method == 8:
         base_data =  [preprocess.improve_asls(d,param[0], param[1],param[2]) for d in smoothed_data]
-    elif a2 == 9:
+    elif index_baseline_method == 9:
         base_data =  [preprocess.normal_poly(d,param[0]) for d in smoothed_data]
-    elif a2 == 10:
+    elif index_baseline_method == 10:
         base_data = [preprocess.mod_poly(d,param[0]) for d in smoothed_data]
-    elif a2 == 11:
+    elif index_baseline_method == 11:
         base_data =  [preprocess.improve_mod_poly(d,param[0]) for d in smoothed_data]
-    elif a2 == 12:
+    elif index_baseline_method == 12:
         base_data =  [preprocess.penalized_poly(d,param[0]) for d in smoothed_data]
-    elif a2 == 13:
+    elif index_baseline_method == 13:
         base_data =  [preprocess.quantile_poly(d,param[0],param[1]) for d in smoothed_data]
-    elif a2 == 14:
+    elif index_baseline_method == 14:
         base_data =  [preprocess.quantile_spline(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
-    elif a2 == 15:
+    elif index_baseline_method == 15:
         base_data =  [preprocess.spline_airpls(d,param[0],param[1],param[2]) for d in smoothed_data]
-    elif a2 == 16:
+    elif index_baseline_method == 16:
         base_data =  [preprocess.spline_arpls(d,param[0],param[1],param[2]) for d in smoothed_data]
-    elif a2 == 17:
+    elif index_baseline_method == 17:
         base_data =  [preprocess.spline_asls(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
-    elif a2 == 18:
+    elif index_baseline_method == 18:
         base_data =  [preprocess.improve_spline_arpls(d,param[0],param[1],param[2]) for d in smoothed_data]
-    elif a2 == 19:
+    elif index_baseline_method == 19:
         base_data =  [preprocess.improve_spline_asls(d,param[0],param[1],param[2],param[3],param[4]) for d in smoothed_data]
-    elif a2 == 20:
+    elif index_baseline_method == 20:
         base_data =  [preprocess.amormol(d,param[0]) for d in smoothed_data]
     else:
         base_data =  [preprocess.snip(d,param[0]) for d in smoothed_data]
 
     return base_data
 
-def perform_normalization(base_data,a3,allele,replicants,references):
-    if a3 == 0:
+def perform_normalization(base_data,index_normalization_method,alleles_normalization_parameters,replicants,references):
+    """Perform the normalization of the raman spectra using a specific method and parameters).
+
+    Parameters
+    ---------- 
+ 
+    base_data : array like of pandas dataframe
+        List of the spectra of the raman experiement (pandas dataframe) after cropping 
+        and possibly the smoothing and baseline correction
+    
+    index_normalization_method : int
+        index of the baseline correction methods (2nd gene of the chromosome during GA optimization)
+
+    alleles_nomalization_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+
+    replicants : int
+        Number of replication of each sample
+
+    references : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity cropped the same way than the other raman spectra
+        Reference raman spectra (BlanK)
+
+
+    Returns
+    -------
+    norm_data : array like of pandas dataframe
+        List of the spectra of the raman experiement after normalization (pandas dataframe)
+    """
+    if index_normalization_method == 0:
         norm_data = [d for d in base_data]
-    elif a3 == 1:
+    elif index_normalization_method  == 1:
         norm_data = preprocess.msc(base_data,replicants, reference=references)
     else:
         norm_data = preprocess.snv(base_data)
@@ -170,46 +304,182 @@ def perform_normalization(base_data,a3,allele,replicants,references):
 
 ### Population ####
 
-def generate_chromosome(alleles_smoothing,alleles_baseline,alleles_norm):
+def generate_chromosome(alleles_smoothing_parameters,alleles_baseline_parameters,alleles_normalization_parameters):
+    """Generate a chromosome with randomly choosen indexes for each preprocessing method
+        (Smoothing / Baseline Correction / Normalization) and pass by the parameters for each preprocessing
+        methods
+
+    Parameters
+    ---------- 
+
+    alleles_smoothing_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+    
+    alleles_baseline_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+ 
+    alleles_normalization_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+    
+
+    Returns
+    -------
+    chro : array like
+        2 Elements in the list "chro" :
+            List of randomly selected index of each preprocessing methods (Smoothing/Baseline/Normalization)
+            List of default parameters / range for each preprocessing method (Smoothing/Baseline/Normalization)
+    """
     a1 = random.randint(0,2)
-    smooth_a1 = alleles_smoothing[a1]
+    smooth_a1 = alleles_smoothing_parameters[a1]
     a1_param = copy.deepcopy(smooth_a1)
     a2 = random.randint(0,21)
-    base_a2 = alleles_baseline[a2]
+    base_a2 = alleles_baseline_parameters[a2]
     a2_param = copy.deepcopy(base_a2)
     a3 = random.randint(0,2)
-    norm_a3 = alleles_norm[a3]
+    norm_a3 = alleles_normalization_parameters[a3]
     a3_param = copy.deepcopy(norm_a3)
     chromosome = [a1,a2,a3]
     chromo_param = [a1_param,a2_param,a3_param]
     chro = [chromosome,chromo_param]
     return chro
 
-def generate_pop_ini_random(pop_nb,al_smoothing,al_baseline,al_norm):
+def generate_pop_ini_random(pop_nb,al_smoothing_parameters,al_baseline_parameters,al_norm_parameters):
+    """ Generate a population with a selected number of randomly generated chromosome
+
+    Parameters
+    ---------- 
+
+    pop_nb : int
+        Number of chromosomes wanted in the initial population
+
+    al_smoothing_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+    
+    al_baseline_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+ 
+    al_norm_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+    
+
+    Returns
+    -------
+    population : array like
+        List of all the randomly generated chromosome for the initial population
+        
+    """
     population = []
     for i in range(pop_nb):
-        population.append(generate_chromosome(al_smoothing,al_baseline,al_norm))
+        population.append(generate_chromosome(al_smoothing_parameters,al_baseline_parameters,al_norm_parameters))
     return population
 
 ### FITNESS ###
 
-def get_chro_fitness(chrom,cropped_data,file_names,references,triplicants,same_samp):
+def get_chro_fitness(chrom,cropped_data,file_names,references,replicants,same_samp):
+    """Calculate the fitness (ratio b/w (variance between each sample (Variance inter Sample) over
+        the variance within each samples (Variance intra sample))) of a chromosome
+        by performing the preprocessing defined by this chormosome over the cropped raman sample.
+
+    Parameters
+    ----------
+
+    chrom : array like
+        2 Elements in the list "chrom" :
+            List of randomly selected index of each preprocessing methods (Smoothing/Baseline/Normalization)
+            List of default parameters / range for each preprocessing method (Smoothing/Baseline/Normalization
+
+    cropped_data : array like of pandas dataframe
+        List of the spectra of the raman experiement with cropping (pandas dataframe)
+
+    file_names : array of string
+        List of all the names corresponding to the raman spectra files 
+ 
+    
+    references : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity cropped the same way than the other raman spectra
+        Reference raman spectra (BlanK)
+
+    replicants : int
+        Number of replicants for each sample.
+
+    same_sample : array of string
+        List of all the sample number (string) to ignore during the calcualtion
+        i.e. Differents sample with the same parameter of the experiment (DOE middle triplicants)
+    
+    Returns
+    -------
+    indiv_fitness : float
+        Fitness of the chromosome
+        ratio of the variances inter/intra sample (b/w) related to the defined preprocessinbg method 
+        defined by the chromosome..
+    """
     smooth_data = perform_smoothing(cropped_data,chrom[0][0],chrom[1][0])
     smooth_ref = perform_smoothing(references,chrom[0][0],chrom[1][0])
     baseline_corrected_data = perform_baseline(smooth_data,chrom[0][1],chrom[1][1])
     baseline_corrected_ref = perform_baseline(smooth_ref,chrom[0][1],chrom[1][1])
-    normal_data = perform_normalization(baseline_corrected_data,chrom[0][2],chrom[1][2],triplicants,baseline_corrected_ref)
-    indiv_fitness = evaluate(file_names,normal_data,same_samp,triplicants)
+    normal_data = perform_normalization(baseline_corrected_data,chrom[0][2],chrom[1][2],replicants,baseline_corrected_ref)
+    indiv_fitness = evaluate(file_names,normal_data,same_samp,replicants)
     return indiv_fitness
 
-def get_pop_fitness(pop,cropped_data,file_names,references,triplicants,same_samp):
+def get_pop_fitness(pop,cropped_data,file_names,references,replicants,same_samp):
+    """Calculate all the fitness of the chromosome inside the population.
+
+    Parameters
+    ----------
+
+    population : array like
+        List of all the chromosome inside population
+
+    cropped_data : array like of pandas dataframe
+        List of the spectra of the raman experiement with cropping (pandas dataframe)
+
+    file_names : array of string
+        List of all the names corresponding to the raman spectra files 
+    
+    references : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity cropped the same way than the other raman spectra
+        Reference raman spectra (BlanK)
+
+    replicants : int
+        Number of replicants for each sample.
+
+    same_sample : array of string
+        List of all the sample number (string) to ignore during the calcualtion
+        i.e. Differents sample with the same parameter of the experiment (DOE middle triplicants)
+    
+    Returns
+    -------
+    pop_fitness : array like (list of float)
+        List of fitness of each chromosome inside the population
+        (ratio of the variances inter/intra sample (b/w) related to the defined preprocessing method 
+        defined by each chromosome inside the population).
+    """
     pop_fitness = []
     for chrom in pop:
-        chrom_fit = get_chro_fitness(chrom,cropped_data,file_names,references,triplicants,same_samp)
+        chrom_fit = get_chro_fitness(chrom,cropped_data,file_names,references,replicants,same_samp)
         pop_fitness.append(chrom_fit)
     return pop_fitness
 
 def get_best_fitness(fitness):
+    """Get the chromosome with the best fitness value and its index inside the population.
+
+    Parameters
+    ----------
+    fitness : array like (list of float)
+        List of fitness of each chromosome inside the population
+        (ratio of the variances inter/intra sample (b/w) related to the defined preprocessing method 
+        defined by each chromosome inside the population).
+    
+    Returns
+    -------
+    best_fit : float
+        Best chromosome's fitness value in the population
+    
+    iter_stock : int
+        Index_of the chromosome with the best fitness inside the population 
+    """
     best_fit = 0
     iter_stock = 0
     for i in range(len(fitness)):
@@ -223,7 +493,30 @@ def get_best_fitness(fitness):
 ### NEXT GENERATION ###
 
 def elitism_selection(pop,fitness):
-  
+    """
+
+    Parameters
+    ----------
+
+    population : array like 
+        List of all the chromosome inside population
+
+    fitness : array like (list of float)
+        List of fitness of each chromosome inside the population
+        (ratio of the variances inter/intra sample (b/w) related to the defined preprocessing method 
+        defined by each chromosome inside the population).
+    
+    Returns
+    -------
+    elitism_pop : array like
+        List of the 5 chromosomes with the 1th to 5th best fitness value inside population
+    
+    sec_elitism_pop : array like
+        List of the 5 chromosomes with the 6th to 10th best fitness value inside population
+
+    noob_pop : array like
+        List of the 5 chromosomes with the 6th to 10th best fitness value inside population
+    """
     fit = copy.deepcopy(fitness)
     popu = copy.deepcopy(pop)
     zip_pop = zip(fit,popu)
