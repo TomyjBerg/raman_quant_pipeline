@@ -313,10 +313,10 @@ def generate_chromosome(alleles_smoothing_parameters,alleles_baseline_parameters
     ---------- 
 
     alleles_smoothing_parameters : array like
-        list of all the normalization methods that are a list of parameters / range of parameter
+        list of all the smoothing methods that are a list of parameters / range of parameter
     
     alleles_baseline_parameters : array like
-        list of all the normalization methods that are a list of parameters / range of parameter
+        list of all the baseline correction methods that are a list of parameters / range of parameter
  
     alleles_normalization_parameters : array like
         list of all the normalization methods that are a list of parameters / range of parameter
@@ -493,7 +493,8 @@ def get_best_fitness(fitness):
 ### NEXT GENERATION ###
 
 def elitism_selection(pop,fitness):
-    """
+    """Get the chromosomes with respectively the 1th to 5th, 6th to 10th best fitness and the 5 worst fitness
+    from the population
 
     Parameters
     ----------
@@ -515,7 +516,7 @@ def elitism_selection(pop,fitness):
         List of the 5 chromosomes with the 6th to 10th best fitness value inside population
 
     noob_pop : array like
-        List of the 5 chromosomes with the 6th to 10th best fitness value inside population
+        List of the 5 chromosomes with the worst fitness value inside population
     """
     fit = copy.deepcopy(fitness)
     popu = copy.deepcopy(pop)
@@ -530,6 +531,31 @@ def elitism_selection(pop,fitness):
     return elitism_pop,sec_elitism_pop,noob_pop
 
 def crossover_param(father,mother):
+    """ Perform crossover reproduction over 2 chromosomes (fatehr/mother) by selecting ransdomly
+         an index point and create one new chromosome with the element in the father list before
+         the index point and the element in the mother list after the index point.
+         Then create another new chromosome with the element in the mother list before the the 
+         index point and the element in the father list after the index point.
+
+    Parameters
+    ----------
+
+    father : array like 
+        Father-Chromosome for crossover reproduction
+        2 Elements in the list "father" :
+            List of randomly selected index of each preprocessing methods (Smoothing/Baseline/Normalization)
+            List of default parameters / range for each preprocessing method (Smoothing/Baseline/Normalization
+
+    mother : array like
+        Mother-Chromosome for crossover reproduction
+        same element than in the "father" list
+    
+    Returns
+    -------
+    childs : array like
+        List of 2 chromosomes (daughter and son) from the parents chromosome (crossover reproduction)
+    
+    """
     boy = []
     boy_param = []
     girl = []
@@ -551,49 +577,161 @@ def crossover_param(father,mother):
     childs = [boy_full,girl_full]
     return childs
 
-def directed_reproduction(elitism_pop,gen_noob):
+def directed_reproduction(sec_elitism_pop,gen_noob):
+    """ Directed reproduction by performing a crossover reproduction with a non_randomly selection of 
+        parents. The chromosomes in the sec_elitsism_pop list reproduce with the chromosome in the 
+        gen_noob list element_wise
+
+    Parameters
+    ----------
+
+    sec_elitism_pop : array like
+        List of the 5 chromosomes with the 6th to 10th best fitness value inside population
+        A chromosome is a list of 2 elements :
+            List of randomly selected index of each preprocessing methods (Smoothing/Baseline/Normalization)
+            List of default parameters / range for each preprocessing method (Smoothing/Baseline/Normalization)
+
+
+    noob_pop : array like
+        List of the 5 chromosomes with the worst fitness value inside population
+    
+    Returns
+    -------
+    dir_childs : array like
+        List of a new chromosomes (daughters and sons) from the selected parents chromosome 
+        (by a crossover reproduction)
+    
+    """
     dir_childs = []
-    for i in range(int(len(elitism_pop))):
-        father = elitism_pop[i]
+    for i in range(int(len(sec_elitism_pop))):
+        father = sec_elitism_pop[i]
         mother = gen_noob[i]
         childs = crossover_param(father,mother)
         childs_ = copy.deepcopy(childs)
         dir_childs = dir_childs + childs_
     return dir_childs
 
-def param_mutation(allele,proba):
-    param_range = allele[-1]
+def param_mutation(allele_param,proba_allele_mut):
+    """ Define new parameter or not (chosen by probability) for a preprocessing method using by selected
+        randomly a parameter inside the range previously defined with the value that could be taken for 
+        each parameter
+
+    Parameters
+    ----------
+
+    allele_param : array like
+        List of parameters / range of a preprocessing method (Smoothing/Baseline/Normalization)
+
+    proba_allele_mut : array like
+        Probability than the parameters for a defined preprocessing method can mutate
+    
+    Returns
+    -------
+    allele_param : array like
+        List of parameters / range for the preprocessing (Smoothing/Baseline/Normalization)
+        with the new parameters modified or not by the function
+    
+    """
+    param_range = allele_param[-1]
     for i in range(len(param_range)):
         rand = random.random()
-        if rand < proba:
-            allele[i] = random.choice(param_range[i])
-    return allele
+        if rand < proba_allele_mut:
+            allele_param[i] = random.choice(param_range[i])
+    return allele_param
 
-def allele_mutation(chro,proba):
+def allele_mutation(chro,proba_allele_mut):
+    """ Create new chromosome with different parameter or not (chosen by probability) for each preprocessing method
+        by selected randomly a parameter inside the range previously defined with the value that 
+        could be taken for each parameter
+
+    Parameters
+    ----------
+
+    chro : array like
+        2 Elements in the list "chro" :
+            List of index of each preprocessing methods (Smoothing/Baseline/Normalization)
+            List of parameters / range for each preprocessing method (Smoothing/Baseline/Normalization)
+
+    proba_allele_mut : array like
+        Probability than the parameters for a defined preprocessing method can mutate
+    
+    Returns
+    -------
+    new_chro : array like
+        2 Elements in the list "new_chro" :
+            List of index of each preprocessing methods (Smoothing/Baseline/Normalization)
+            List of parameters (modified or not)/ range for each preprocessing method (Smoothing/Baseline/Normalization)
+    
+    """
     gene = chro[0]
     allele = chro[1]
     new_allele = []
     for i in range(len(allele)):
-        param = param_mutation(allele[i],proba)
+        param = param_mutation(allele[i],proba_allele_mut)
         new_allele.append(param)
     new_chro = [gene,new_allele]
     return new_chro
 
-def affine(elitism_pop,proba):
+def affine(elitism_pop,proba_mut_allele):
+    """ Create a 3 times a list of new chromosomes with different parameter or not (chosen by probability) for each 
+        preprocessing method for the 5 chromosomes with the best fitness inside the current population
+        and then combine the list into one list
+
+    Parameters
+    ----------
+
+    elitism_pop : array like
+        List of the 5 chromosomes with the 1th to 5th best fitness value inside population
+
+    proba_mut_allele : array like
+        Probability than the parameters for a defined preprocessing method can mutate
+    
+    Returns
+    -------
+    pop_elitism_param_mutation : array like
+        List of the 15 new chromosomes (same preprocessing method than the input but probably with different
+        parameters)
+    """
     pop_elitism_param_mutation = []
     for i in range(len(elitism_pop)):
-        if i < 5:
-            for j in range(3):
-                elite_chro = copy.deepcopy(elitism_pop[i])
-                new_chrom = allele_mutation(elite_chro,proba)
-                pop_elitism_param_mutation.append(new_chrom)
-        else:
+        for j in range(3):
             elite_chro = copy.deepcopy(elitism_pop[i])
-            new_chrom = allele_mutation(elite_chro,proba)
+            new_chrom = allele_mutation(elite_chro,proba_mut_allele)
             pop_elitism_param_mutation.append(new_chrom)
     return pop_elitism_param_mutation
 
-def mutation(childs,probability,allele_proba,alleles_smoothing,alleles_baseline,alleles_norm):
+def mutation(childs,proba_gen_mut,proba_allele_mut,alleles_smoothing_parameters,alleles_baseline_parameters,
+    alleles_norm_parameters):
+    """ Probably modify the preprocessing methods (smoothing methods / baseline methods / normalization method)
+        and probably select the default parameters or randomly selected new onnes for those methods
+
+    Parameters
+    ----------
+
+    childs  : array like 
+        new population of chromosomes that have to be mutated
+
+    proba_gen_mut : float
+        Probability that one or more than one preprocessing method of the chromosome will be change
+    
+    proba_allele_mut : float
+        Probability that one or more than one preprocessing method of the chromosome will be change
+
+    alleles_smoothing_parameters : array like
+        list of all the smoothing methods that are a list of parameters / range of parameter
+    
+    alleles_baseline_parameters : array like
+        list of all the baseline correction methods that are a list of parameters / range of parameter
+ 
+    alleles_normalization_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+    
+    Returns
+    -------
+    pop_elitism_param_mutation : array like
+        List of the 15 new chromosomes (same preprocessing method than the input but probably with different
+        parameters)
+    """
     for chromosome in childs:
         for allele in range(len(chromosome[0])):
           if allele == 0:
