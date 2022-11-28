@@ -715,7 +715,7 @@ def mutation(childs,proba_gen_mut,proba_allele_mut,alleles_smoothing_parameters,
         Probability that one or more than one preprocessing method of the chromosome will be change
     
     proba_allele_mut : float
-        Probability that one or more than one preprocessing method of the chromosome will be change
+        Probability than the parameters for a defined preprocessing method can mutate
 
     alleles_smoothing_parameters : array like
         list of all the smoothing methods that are a list of parameters / range of parameter
@@ -728,74 +728,173 @@ def mutation(childs,proba_gen_mut,proba_allele_mut,alleles_smoothing_parameters,
     
     Returns
     -------
-    pop_elitism_param_mutation : array like
-        List of the 15 new chromosomes (same preprocessing method than the input but probably with different
-        parameters)
+    childs  : array like 
+        new population of chromosomes that have been mutated or not
     """
     for chromosome in childs:
         for allele in range(len(chromosome[0])):
           if allele == 0:
             rand = random.random()
-            if rand < probability:
+            if rand < proba_gen_mut:
                 a1 = random.randint(0,2)
                 chromosome[0][0] = a1
-                a1_smooth = copy.deepcopy(alleles_smoothing[a1])
-                a1_mute = param_mutation(a1_smooth,allele_proba)
+                a1_smooth = copy.deepcopy(alleles_smoothing_parameters[a1])
+                a1_mute = param_mutation(a1_smooth,proba_allele_mut)
                 chromosome[1][0] = a1_mute
           elif allele == 1:
             rand = random.random()
-            if rand < probability:
+            if rand < proba_gen_mut:
                 a2 = random.randint(0,21)
                 chromosome[0][1] = a2
-                a2_base = copy.deepcopy(alleles_baseline[a2])
-                a2_mute = param_mutation(a2_base,allele_proba)
+                a2_base = copy.deepcopy(alleles_baseline_parameters[a2])
+                a2_mute = param_mutation(a2_base,proba_allele_mut)
                 chromosome[1][1] = a2_mute
           else:
             rand = random.random()
-            if rand < probability:
+            if rand < proba_gen_mut:
                 a3 = random.randint(0,2)
                 chromosome[0][2] = a3
-                chromosome[1][2] = alleles_norm[a3]
+                chromosome[1][2] = alleles_norm_parameters[a3]
     return childs
 
 
-def next_generation(pop,fit_pop,mut_proba,all_mut_proba,al_smooth,al_base,al_norm):
+def next_generation(pop,fit_pop,proba_gen_mut,proba_allele_mut,al_smooth_parameters,al_base_parameters,al_norm_parameters):
+    """ Create the new generation using an elistim selection / directed crossover reproduction / 
+        mutation of the preprocessing methods / mutation of the parameters of the preprocessing methods
+
+    Parameters
+    ----------
+
+    pop : array like 
+        List of all the chromosome inside population
+
+    fit_pop : array like (list of float)
+        List of fitness of each chromosome inside the population
+        (ratio of the variances inter/intra sample (b/w) related to the defined preprocessing method 
+        defined by each chromosome inside the population).
+    
+    proba_gen_mut : float
+        Probability that one or more than one preprocessing method of the chromosome will be change
+    
+    proba_allele_mut : float
+        Probability than the parameters for a defined preprocessing method can mutate
+   
+
+    al_smoothing_parameters : array like
+        list of all the smoothing methods that are a list of parameters / range of parameter
+    
+    al_baseline_parameters : array like
+        list of all the baseline correction methods that are a list of parameters / range of parameter
+ 
+    al_normalization_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+    
+    Returns
+    -------
+    next_gen  : array like 
+        new population of chromosomes :
+            5 best chromosome's fitness (elitism selection)
+            15 copy of the 5 best chromosome's fitness with probabily parameter of preprocessing mutation
+            10 directed reproduction (6th to 10th best chromosome's fitness // 5 worst chromosome's fitness)
+            (probabily preprocessing method / parameter mutation)
+    """
     next_gen_elitism,next_gen_sec,next_gen_noob = elitism_selection(pop,fit_pop)
     next_gen_cross = copy.deepcopy(next_gen_sec)
     next_gen_worst = copy.deepcopy(next_gen_noob)
     next_gen_elite = copy.deepcopy(next_gen_elitism)
     next_gen_chro = directed_reproduction(next_gen_cross,next_gen_worst)
-    next_gen_chro = mutation(next_gen_chro,mut_proba,all_mut_proba,al_smooth,al_base,al_norm)
-    next_gen_affine = affine(next_gen_elite,all_mut_proba)
-    next_gen_affine = mutation(next_gen_affine,mut_proba,all_mut_proba,al_smooth,al_base,al_norm)
+    next_gen_chro = mutation(next_gen_chro,proba_gen_mut,proba_allele_mut,al_smooth_parameters,al_base_parameters,al_norm_parameters)
+    next_gen_affine = affine(next_gen_elite,proba_gen_mut)
+    next_gen_affine = mutation(next_gen_affine,proba_gen_mut,proba_allele_mut,al_smooth_parameters,al_base_parameters,al_norm_parameters)
     next_gen = next_gen_elitism + next_gen_chro + next_gen_affine
     return next_gen
 
-def perform_GA_optimization(pop_size,mut_prob,allele_mut_prob,patience_cond,cropped_data,file_names,
-triplicants,references,alleles_smoothing,alleles_baseline,alleles_norm,same_samp):
-    pop1 = generate_pop_ini_random(pop_size,alleles_smoothing,alleles_baseline,alleles_norm)
+def perform_GA_optimization(pop_size,probability_meth_mut,probability_param_mut,patience_cond,cropped_data,
+file_names,replicants,references,alleles_smoothing_parameters,alleles_baseline_parameters,alleles_norm_parameters,
+same_samp):
+    """ Perform optimization in order to select the best preprocessing methods and parameters by the fitness
+        along multiple generation using a genetic algorithm with elitism selection and directed reproduction
+
+    Parameters
+    ----------
+    
+    pop_nb : int
+        Number of chromosomes wanted in the initial population
+    
+    probability_meth_mut : float
+        Probability that one or more than one preprocessing method of the chromosome will be change
+    
+    probability_param_mut : float
+        Probability than the parameters for a defined preprocessing method can mutate
+
+    patience_cond : int
+        number of iteration wanted before the algorithm stop without any modification of the best fitness
+
+    cropped_data : array like of pandas dataframe
+        List of the spectra of the raman experiement with cropping (pandas dataframe)
+
+    file_names : array of string
+        List of all the names corresponding to the raman spectra files 
+    
+    replicants : int
+        Number of replicants for each sample.
+ 
+    references : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity cropped the same way than the other raman spectra
+        Reference raman spectra (BlanK)
+
+    alleles_smoothing_parameters : array like
+        list of all the smoothing methods that are a list of parameters / range of parameter
+    
+    alleles_baseline_parameters : array like
+        list of all the baseline correction methods that are a list of parameters / range of parameter
+ 
+    alleles_normalization_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+    
+    same_sample : array of string
+        List of all the sample number (string) to ignore during the calcualtion
+        i.e. Differents sample with the same parameter of the experiment (DOE middle triplicants)
+    
+    Returns
+    -------
+    best_fitness : float
+        Fitness of the best chromosomes / the best preprocessing method and parameter determined 
+        by the GA algorithm
+        The fitness is ratio of the variances inter/intra sample (b/w) related to the defined preprocessinbg method 
+        defined by the chromosome..
+
+    best_preprocessing : array like
+        Chromosome selected by the Optimization by the Genetic Algorithm, having the best fitness value
+        The chromosome is composed of :
+            List of index of the best of each preprocessing methods determined by the GA algorithm
+            List of best parameters / range for each best preprocessing methods
+
+    """
+    pop1 = generate_pop_ini_random(pop_size,alleles_smoothing_parameters,alleles_baseline_parameters,alleles_norm_parameters)
     pop = pop1
     best_fitness = 0
     patience = 0
     iter = 0
     x_ = []
     y_ = []
-    best_scenario = pd.DataFrame
     while patience < patience_cond:
         iter = iter + 1
         x_.append(iter)
-        fit_pop = get_pop_fitness(pop,cropped_data,file_names,references,triplicants,same_samp)
+        fit_pop = get_pop_fitness(pop,cropped_data,file_names,references,replicants,same_samp)
         best_fit = get_best_fitness(fit_pop)
         y_.append(best_fit[0])
         print(pop[best_fit[1]])
         if best_fit[0] > best_fitness:
             patience = 0
-            best_preproc = pop[best_fit[1]]
-            best_fitness = best_fit[0]
+            best_preprocessing = copy.deepcopy(pop[best_fit[1]])
+            best_fitness = copy.deepcopy(best_fit[0])
         else:
             patience = patience + 1
-        new_pop = next_generation(pop,fit_pop,mut_prob,allele_mut_prob,alleles_smoothing,alleles_baseline,alleles_norm)
+        new_pop = next_generation(pop,fit_pop,probability_meth_mut,probability_param_mut,alleles_smoothing_parameters,
+                                alleles_baseline_parameters,alleles_norm_parameters)
         pop = copy.deepcopy(new_pop)
 
-    return best_fitness,best_preproc
+    return best_fitness,best_preprocessing
 
