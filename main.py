@@ -1,5 +1,8 @@
 import get_spectra_data as get_data
-import preprocess_method as preprocess
+import preprocess_baseline_methods as basecorrecter
+import preprocess_smoothing_methods as smoother
+import preprocess_normalization_methods as normalizer
+import preprocess_cropping_methods as cropper
 import ga_preprocess_optimization as gapro
 import preprocess_DefaultParameter as preprocessparam
 import copy 
@@ -12,13 +15,13 @@ spectra_files,file_names = get_data.get_spectra_files(folder_path,delete_experim
 
 shift_lim = [450, 1550]
 
-cropped_files = [preprocess.crop_file(f, shift_lim) for f in spectra_files]
+cropped_files = [cropper.crop_file(f, shift_lim) for f in spectra_files]
 #smooth_files = [preprocess.crop_file(f, shift_lim) for f in spectra_files]
 
 #print(cropped_files)
 
 ref_spectra,ref_name = get_data.get_spectra_specific_file(folder_path,['0'])
-cropped_ref = [preprocess.crop_file(f, shift_lim) for f in ref_spectra]
+cropped_ref = [cropper.crop_file(f, shift_lim) for f in ref_spectra]
 
 
 same = ['5','6','11','12','13']
@@ -38,6 +41,6 @@ mut_all = 0.5
 patience = 10
 
 test_GA = gapro.perform_GA_optimization(pop_size,mut_gene,mut_all,patience,cropped_files,file_names,rep,
-                           cropped_ref,alleles_smoothing,alleles_baseline,alleles_normaliztaion,same)
+                           cropped_ref,alleles_smoothing,alleles_baseline,alleles_normaliztaion,same,verbose=True)
 
 
