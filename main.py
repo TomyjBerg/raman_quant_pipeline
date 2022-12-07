@@ -1,6 +1,6 @@
-import get_Spectra_data as get_data
+import get_spectra_data as get_data
 import preprocess_method as preprocess
-import GA_preprocess_optimization as gapro
+import ga_preprocess_optimization as gapro
 import preprocess_DefaultParameter as preprocessparam
 import copy 
 import numpy as np

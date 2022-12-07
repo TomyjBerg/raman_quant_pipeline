@@ -173,7 +173,7 @@ def perform_baseline_correction(y, lambda_whittaker, penalty_whittaker):
     return z
 
 
-def airpls(y,lambda_air):
+def airpls(y,lambda_air,m_order_air=2):
     """Perform baseline correction of data by applying an adaptative iteratively reweighted penalized 
     least squares (airPLS) for baseline fiiting using the airpls function from the pybaseline package
 
@@ -184,6 +184,9 @@ def airpls(y,lambda_air):
         [1] = intensity with baseline to be removed
     lambda_air : int
         more lambda_air is high, more the baseline will be smoothed
+    m_order_air : int
+        The order of the differential matrix. Must be greater than 0. Default is 2
+
         
     Returns
     -------
@@ -197,7 +200,6 @@ def airpls(y,lambda_air):
         preprocessing strategies of the basis of the ability to refine the 
         relationship between variance components
     """
-    m_order_air = 2
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -208,7 +210,7 @@ def airpls(y,lambda_air):
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
-def asls(y,lambda_as,penalty_as):
+def asls(y,lambda_as,penalty_as,m_order_as=2):
     """Perform baseline correction of data by applying an asymetric least squares (asls) 
         for baseline fiiting using the asls function from the pybaseline package
 
@@ -221,6 +223,9 @@ def asls(y,lambda_as,penalty_as):
         The smoothing parameter, Larger values will create smoother baselines.
     penalty_as : float (between 0 and 1)
         The penalizing weighting factor. Must be between 0 and 1.
+    m_order_as : int
+        The order of the differential matrix. Must be greater than 0. Default is 2
+    
         
     Returns
     -------
@@ -236,7 +241,6 @@ def asls(y,lambda_as,penalty_as):
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    m_order_as = 2
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -248,7 +252,7 @@ def asls(y,lambda_as,penalty_as):
     return z
 
 
-def arpls(y,lambda_ar):
+def arpls(y,lambda_ar,m_order_ar=2):
     """Perform baseline correction of data by applying an asymetric reweighted penalized least squares (arpls) 
         for baseline fiiting using the arpls function from the pybaseline package
 
@@ -259,6 +263,8 @@ def arpls(y,lambda_ar):
         [1] = intensity with baseline to be removed
     lambda_ar : float
         The smoothing parameter, Larger values will create smoother baselines.
+    m_order_ar : int
+        The order of the differential matrix. Must be greater than 0. Default is 2
 
     Returns
     -------
@@ -274,7 +280,6 @@ def arpls(y,lambda_ar):
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    m_order_ar = 2
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -285,7 +290,7 @@ def arpls(y,lambda_ar):
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
-def aspls(y,lambda_aspls):
+def aspls(y,lambda_aspls,m_order_aspls=2):
     """Perform baseline correction of data by applying an adaptative smoothness penalized least squares(aspls) 
         for baseline fiiting using the aspls function from the pybaseline package
 
@@ -296,6 +301,8 @@ def aspls(y,lambda_aspls):
         [1] = intensity with baseline to be removed
     lambda_aspls : float
         The smoothing parameter, Larger values will create smoother baselines.
+    m_order_aspls : int
+        The order of the differential matrix. Must be greater than 0. Default is 2
         
     Returns
     -------
@@ -311,7 +318,6 @@ def aspls(y,lambda_aspls):
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    m_order_aspls = 2
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -323,7 +329,7 @@ def aspls(y,lambda_aspls):
     return z
 
 
-def drpls(y,lambda_dr,eta_dr):
+def drpls(y,lambda_dr,eta_dr,m_order_dr=2):
     """Perform baseline correction of data by applying an doubly reweighted penalized least squares (drpls) 
         for baseline fiiting using the drpls function from the pybaseline package
 
@@ -337,7 +343,8 @@ def drpls(y,lambda_dr,eta_dr):
     eta_dr : float (between 0 and 1)
         A term for controlling the value of lamda_dr; should be between 0 and 1. 
         Low values will produce smoother baselines, while higher values will more aggressively fit peaks.
-        
+    m_order_dr : int
+        The order of the differential matrix. Must be greater than 0. Default is 2  
     Returns
     -------
     y : pandas dataframe
@@ -352,7 +359,6 @@ def drpls(y,lambda_dr,eta_dr):
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    m_order_dr = 2
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -363,7 +369,7 @@ def drpls(y,lambda_dr,eta_dr):
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
-def improve_arpls(y,lambda_iar):
+def improved_arpls(y,lambda_iar,m_order_iar=2,max_iter_iar=20):
     """Perform baseline correction of data by applying an improve asymmetrical reweighted 
         penalized least squares (iarpls) for baseline fiiting using the iarpls function 
         from the pybaseline package
@@ -375,6 +381,11 @@ def improve_arpls(y,lambda_iar):
         [1] = intensity with baseline to be removed
     lambda_iar : float
         The smoothing parameter, Larger values will create smoother baselines..
+    m_order_iar : int
+        The order of the differential matrix. Must be greater than 0. Default is 2
+    max_iter_iar :
+        The max number of fit iterations. Default is 20.
+    
     Returns
     -------
     y : pandas dataframe
@@ -389,8 +400,6 @@ def improve_arpls(y,lambda_iar):
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    m_order_iar = 2
-    max_iter_iar = 20
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -401,7 +410,7 @@ def improve_arpls(y,lambda_iar):
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
-def improve_asls(y,lambda_ias,penalty_ias,lambdaDer1_ias):
+def improved_asls(y,lambda_ias,penalty_ias,lambdaDer1_ias,max_iter_ias=50):
     """Perform baseline correction of data by applying an improve asymmetrical least squares (iasls) 
         for baseline fiiting using the iasls function from the pybaseline package
 
@@ -416,12 +425,14 @@ def improve_asls(y,lambda_ias,penalty_ias,lambdaDer1_ias):
         The penalizing weighting factor. Must be between 0 and 1.
     lambdaDer1_ias :
         The smoothing parameter for the first derivative of the residual
+    max_iter_ias :
+        The max number of fit iterations. Default is 50.
     Returns
     -------
     y : pandas dataframe
         [0] = raman_shift 
         [1] = intensity without baseline
-        
+    
     References
     ----------
     Martyna et al. 2020. Improving discrimation of Raman spectra by optimising 
@@ -430,7 +441,6 @@ def improve_asls(y,lambda_ias,penalty_ias,lambdaDer1_ias):
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    max_iter_ias = 50
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -525,7 +535,7 @@ def mod_poly(y,modpoly_order):
     return z
 
 
-def improve_mod_poly(y,imodpoly_order):
+def improved_mod_poly(y,imodpoly_order):
     """Perform baseline correction of data by computing an improved modified polynomial that fits 
     the baseline of the data by the "imodpoly" function from the pybaseline package
 
@@ -648,7 +658,7 @@ def quantile_poly(y,qpoly_order,poly_quantile):
 
 # Spline Method
 
-def quantile_spline(y,lambda_irsqr,quantile_irsqr,knots_irsqr,spline_deg_irsqr):
+def quantile_spline(y,lambda_irsqr,quantile_irsqr,knots_irsqr,spline_deg_irsqr,m_order_irsqr=2):
     """Perform baseline correction of data by applying an Iterative Reweighted Spline 
         Quantile Regression (IRSQR) for the baseline fiiting using the "irsqr" function 
         from the pybaseline package
@@ -671,6 +681,9 @@ def quantile_spline(y,lambda_irsqr,quantile_irsqr,knots_irsqr,spline_deg_irsqr):
     spline_deg_irsqr : int
         The degree of the spline (libear,cubic,quadratic)
 
+    m_order_irsqr : int
+        The order of the differential matrix. Must be greater than 0. Default is 2
+
     Returns
     -------
     y : pandas dataframe
@@ -685,7 +698,6 @@ def quantile_spline(y,lambda_irsqr,quantile_irsqr,knots_irsqr,spline_deg_irsqr):
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    m_order_irsqr = 2
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -698,7 +710,7 @@ def quantile_spline(y,lambda_irsqr,quantile_irsqr,knots_irsqr,spline_deg_irsqr):
     return z
 
 
-def spline_airpls(y,lambda_spline_air,knots_air,spline_deg_air):
+def spline_airpls(y,lambda_spline_air,knots_air,spline_deg_air,m_order_spline_air=2):
     """Perform baseline correction of data by applying a penalized spline version of the
         Adaptive iteratively reweighted penalized least squares (airPLS) for the baseline fiiting 
         using the "pspline_airpls" function from the pybaseline package
@@ -717,6 +729,9 @@ def spline_airpls(y,lambda_spline_air,knots_air,spline_deg_air):
 
     spline_air: int
         The degree of the spline (libear,cubic,quadratic)
+    
+    m_order_spline_air : int
+        The order of the differential matrix. Must be greater than 0. Default is 2
 
     
     Returns
@@ -733,7 +748,6 @@ def spline_airpls(y,lambda_spline_air,knots_air,spline_deg_air):
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    m_order_spline_air = 2
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -746,7 +760,7 @@ def spline_airpls(y,lambda_spline_air,knots_air,spline_deg_air):
     return z
 
 
-def spline_asls(y,lambda_spline_asls,penalty_spline_asls,knots_asls,spline_deg_asls):
+def spline_asls(y,lambda_spline_asls,penalty_spline_asls,knots_asls,spline_deg_asls,m_order_spline_asls=2):
     """Perform baseline correction of data by applying a penalized spline version of the
         asymmetric least squares(AsLS) algorithm for the baseline fiiting 
         using the "pspline_asls" function from the pybaseline package
@@ -769,6 +783,9 @@ def spline_asls(y,lambda_spline_asls,penalty_spline_asls,knots_asls,spline_deg_a
     spline_asls: int
         The degree of the spline (libear,cubic,quadratic)
     
+    m_order_spline_asls : int
+        The order of the differential matrix. Must be greater than 0. Default is 2
+    
     Returns
     -------
     y : pandas dataframe
@@ -783,7 +800,6 @@ def spline_asls(y,lambda_spline_asls,penalty_spline_asls,knots_asls,spline_deg_a
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    m_order_spline_asls = 2
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -796,7 +812,7 @@ def spline_asls(y,lambda_spline_asls,penalty_spline_asls,knots_asls,spline_deg_a
     return z
 
 
-def spline_arpls(y,lambda_spline_ar,knots_ar,spline_deg_ar):
+def spline_arpls(y,lambda_spline_ar,knots_ar,spline_deg_ar,m_order_spline_ar=2):
     """Perform baseline correction of data by applying a penalized spline version of the
         Asymmetrically reweighted penalized least squares smoothing (arPLS) algorithm 
         for the baseline fiiting using the "pspline_arpls" function from the pybaseline package
@@ -816,6 +832,9 @@ def spline_arpls(y,lambda_spline_ar,knots_ar,spline_deg_ar):
     spline_ar: int
         The degree of the spline (libear,cubic,quadratic)
     
+    m_order_spline_ar : int
+        The order of the differential matrix. Must be greater than 0. Default is 2
+    
     Returns
     -------
     y : pandas dataframe
@@ -830,7 +849,6 @@ def spline_arpls(y,lambda_spline_ar,knots_ar,spline_deg_ar):
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    m_order_spline_ar = 2
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -842,7 +860,7 @@ def spline_arpls(y,lambda_spline_ar,knots_ar,spline_deg_ar):
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
-def improve_spline_arpls(y,lambda_spline_iar,knots_iar,spline_deg_iar):
+def improved_spline_arpls(y,lambda_spline_iar,knots_iar,spline_deg_iar,m_order_spline_iar=2,max_iter_spline_iar=10):
     """Perform baseline correction of data by applying a penalized spline version of the
         Improved asymmetrically reweighted penalized least squares smoothing (IarPLS) algorithm 
         for the baseline fiiting using the "pspline_arpls" function from the pybaseline package
@@ -861,6 +879,12 @@ def improve_spline_arpls(y,lambda_spline_iar,knots_iar,spline_deg_iar):
 
     spline_iar: int
         The degree of the spline (libear,cubic,quadratic)
+    
+    m_order_spline_iar : int
+        The order of the differential matrix. Must be greater than 0. Default is 2
+    
+    max_iter_spline_iar :
+        The max number of fit iterations. Default is 10.
 
     Returns
     -------
@@ -876,8 +900,7 @@ def improve_spline_arpls(y,lambda_spline_iar,knots_iar,spline_deg_iar):
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    m_order_spline_iar = 2
-    max_iter_spline_iar = 10
+
     index_y =  y.index
     line = y[0]
     data = y[1]
@@ -890,7 +913,7 @@ def improve_spline_arpls(y,lambda_spline_iar,knots_iar,spline_deg_iar):
     z = pd.concat([line, z],axis =1,ignore_index = False)
     return z
 
-def improve_spline_asls(y,lambda_spline_ias,penalty_spline_ias,lambdaDer1_spline_ias,knots_ias,spline_deg_ias):
+def improved_spline_asls(y,lambda_spline_ias,penalty_spline_ias,lambdaDer1_spline_ias,knots_ias,spline_deg_ias,max_iter_spline_ias=10):
     """Perform baseline correction of data by applying a penalized spline version of the
         Fits the baseline using the improved asymmetric least squares (IAsLS) algorithm 
         for the baseline fiiting using the "pspline_arpls" function from the pybaseline package
@@ -916,6 +939,9 @@ def improve_spline_asls(y,lambda_spline_ias,penalty_spline_ias,lambdaDer1_spline
     spline_deg_ias: int
         The degree of the spline (libear,cubic,quadratic)
     
+     max_iter_spline_ias :
+        The max number of fit iterations. Default is 10.
+    
     Returns
     -------
     y : pandas dataframe
@@ -930,7 +956,6 @@ def improve_spline_asls(y,lambda_spline_ias,penalty_spline_ias,lambdaDer1_spline
 
     pybaseline package litterature : https://pybaselines.readthedocs.io/
     """
-    max_iter_spline_ias = 10
     index_y =  y.index
     line = y[0]
     data = y[1]

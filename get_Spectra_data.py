@@ -6,7 +6,7 @@ from os import walk
 
 def list_files(mpath):
   f = []
-  for (dirpath, dirnames, filenames) in walk(mpath):
+  for (_, _, filenames) in walk(mpath):
       f.extend(filenames)
       break
   return(f)
@@ -15,21 +15,24 @@ def list_files(mpath):
 def list_files_2D(mpath,delete_):
   files_2d = []
   files = list_files(mpath)
+  
   for f in files :
-    sh = f.find('_')
-    val = f[0:sh]
-    if f[-6] == '2' and val not in delete_:
-      files_2d.append(f)
+    if f.endswith('.csv'):
+      sh = f.find('_')
+      val = f[0:sh]
+      if f.endswith('2D.csv') and val not in delete_:
+        files_2d.append(f)
   return(files_2d)
 
 def list_files_specific(mpath,spec):
   files_2d = []
   files = list_files(mpath)
   for f in files :
-    sh = f.find('_')
-    val = f[0:sh]
-    if f[-6] == '2' and val in spec:
-      files_2d.append(f)
+    if f.endswith('.csv'):
+      sh = f.find('_')
+      val = f[0:sh]
+      if f.endswith('2D.csv') and val in spec:
+        files_2d.append(f)
   return(files_2d)
 
 

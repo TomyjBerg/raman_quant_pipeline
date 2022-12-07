@@ -1,9 +1,13 @@
-import get_Spectra_data as get_data
+import get_spectra_data as get_data
 import preprocess_method as preprocess
+import preprocess_baseline_methods as basecorrecter
+import preprocess_cropping_methods as smoother
+import preprocess_normalization_methods as normalizer
+import preprocess_cropping_methods as cropper
 import pandas as pd
 import numpy as np
 from sklearn.cross_decomposition import PLSRegression
-import preprocess_method as preprocess
+
 from sklearn.decomposition import PCA
 import copy
 import random
@@ -108,7 +112,6 @@ def get_b(files_names,files,same_sample,replicants):
             if val == name:
                 data_rep[num].append(files[i])
                 num = num + 1
-
     std = 0
     for data in data_rep:
         for k in range(len(data)):
@@ -121,6 +124,7 @@ def get_b(files_names,files,same_sample,replicants):
                 new_df.columns = new_df.iloc[0] 
                 new_df = new_df[1:]
                 df = pd.concat([df, new_df], ignore_index = True)
+
         pca = PCA(n_components=3)
         principalComponents = pca.fit_transform(df)
         principalDf = pd.DataFrame(data = principalComponents
@@ -187,9 +191,9 @@ def perform_smoothing(cropped_files,index_smoothing_method,alleles_smoothing_par
     param = alleles_smoothing_parameters[:-1]
     print(param)
     if index_smoothing_method  == 1:
-        smoothed_data =  [preprocess.whittaker_smoother(d, param[0], param[1]) for d in cropped_files]
+        smoothed_data =  [smoother.whittaker_smoother(d, param[0], param[1]) for d in cropped_files]
     elif index_smoothing_method == 2:
-        smoothed_data =  [preprocess.sg_filter(d,param[0],param[1]) for d in cropped_files]
+        smoothed_data =  [smoother.sg_filter(d,param[0],param[1]) for d in cropped_files]
     else: 
         smoothed_data =  [d for d in cropped_files]
     return smoothed_data
@@ -232,15 +236,15 @@ def perform_baseline(smoothed_data,index_baseline_method,alleles_baseline_parame
     elif index_baseline_method == 6:
         base_data =  [preprocess.drpls(d, param[0], param[1]) for d in smoothed_data]
     elif index_baseline_method == 7:
-        base_data =  [preprocess.improve_arpls(d,param[0]) for d in smoothed_data]
+        base_data =  [preprocess.improved_arpls(d,param[0]) for d in smoothed_data]
     elif index_baseline_method == 8:
-        base_data =  [preprocess.improve_asls(d,param[0], param[1],param[2]) for d in smoothed_data]
+        base_data =  [preprocess.improved_asls(d,param[0], param[1],param[2]) for d in smoothed_data]
     elif index_baseline_method == 9:
         base_data =  [preprocess.normal_poly(d,param[0]) for d in smoothed_data]
     elif index_baseline_method == 10:
         base_data = [preprocess.mod_poly(d,param[0]) for d in smoothed_data]
     elif index_baseline_method == 11:
-        base_data =  [preprocess.improve_mod_poly(d,param[0]) for d in smoothed_data]
+        base_data =  [preprocess.improved_mod_poly(d,param[0]) for d in smoothed_data]
     elif index_baseline_method == 12:
         base_data =  [preprocess.penalized_poly(d,param[0]) for d in smoothed_data]
     elif index_baseline_method == 13:
@@ -254,9 +258,9 @@ def perform_baseline(smoothed_data,index_baseline_method,alleles_baseline_parame
     elif index_baseline_method == 17:
         base_data =  [preprocess.spline_asls(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
     elif index_baseline_method == 18:
-        base_data =  [preprocess.improve_spline_arpls(d,param[0],param[1],param[2]) for d in smoothed_data]
+        base_data =  [preprocess.improved_spline_arpls(d,param[0],param[1],param[2]) for d in smoothed_data]
     elif index_baseline_method == 19:
-        base_data =  [preprocess.improve_spline_asls(d,param[0],param[1],param[2],param[3],param[4]) for d in smoothed_data]
+        base_data =  [preprocess.improved_spline_asls(d,param[0],param[1],param[2],param[3],param[4]) for d in smoothed_data]
     elif index_baseline_method == 20:
         base_data =  [preprocess.amormol(d,param[0]) for d in smoothed_data]
     else:
