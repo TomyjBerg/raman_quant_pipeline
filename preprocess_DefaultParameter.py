@@ -7,6 +7,7 @@ def get_default_smoothing():
 
     Parameters
     ----------
+    None
     
     Returns
     -------
@@ -57,6 +58,7 @@ def get_default_baseline():
 
     Parameters
     ----------
+    None
     
     Returns
     -------
@@ -312,6 +314,7 @@ def get_default_normalization():
 
     Parameters
     ----------
+    None
     
     Returns
     -------
