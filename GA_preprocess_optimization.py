@@ -819,7 +819,7 @@ def perform_mutation(children,proba_gen_mut,proba_allele_mut,alleles_smoothing_p
     
     Returns
     -------
-    childs  : array like 
+    children  : array like 
         new population of chromosomes that have been mutated or not
     """
     for chromosome in children:
