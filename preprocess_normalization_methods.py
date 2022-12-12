@@ -1,6 +1,46 @@
 import numpy as np
 import pandas as pd
 
+
+def perform_normalization(base_data,index_normalization_method,alleles_normalization_parameters,replicants,references):
+    """Perform the normalization of the raman spectra using a specific method and parameters).
+
+    Parameters
+    ---------- 
+ 
+    base_data : array like of pandas dataframe
+        List of the spectra of the raman experiement (pandas dataframe) after cropping 
+        and possibly the smoothing and baseline correction
+    
+    index_normalization_method : int
+        index of the baseline correction methods (2nd gene of the chromosome during GA optimization)
+
+    alleles_nomalization_parameters : array like
+        list of all the normalization methods that are a list of parameters / range of parameter
+
+    replicants : int
+        Number of replication of each sample
+
+    references : pandas dataframe
+        [0] = raman_shift 
+        [1] = intensity cropped the same way than the other raman spectra
+        Reference raman spectra (BlanK)
+
+
+    Returns
+    -------
+    norm_data : array like of pandas dataframe
+        List of the spectra of the raman experiement after normalization (pandas dataframe)
+    """
+    if index_normalization_method == 0:
+        norm_data = [d for d in base_data]
+    elif index_normalization_method  == 1:
+        norm_data = msc(base_data,replicants, reference=references)
+    else:
+        norm_data = snv(base_data)
+    return norm_data
+
+
 def msc(input_datas, replicant,reference=None):
     """Scatter Correction technique performed with mean of the sample data as the reference.
 

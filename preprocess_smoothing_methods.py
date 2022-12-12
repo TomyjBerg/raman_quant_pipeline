@@ -2,6 +2,38 @@ import numpy as np
 import pandas as pd
 from scipy.signal import savgol_filter
 
+
+def perform_smoothing(cropped_files,index_smoothing_method,alleles_smoothing_parameters):
+    """Perform the smoothing of the cropped raman spectra using a specific method and parameters).
+
+    Parameters
+    ---------- 
+ 
+    cropped_files : array like of pandas dataframe
+        List of the spectra of the raman experiement after cropping (pandas dataframe)
+    
+    index_smoothing_method : int
+        index of the smoothing methods (1rt gene of the chromosome during GA optimization)
+
+    alleles_smoothing_parameters : array like
+        list of all the smoothing methods that are a list of parameters / range of parameter
+
+    Returns
+    -------
+    smoothed_data : array like of pandas dataframe
+        List of the spectra of the raman experiement after smoothing (pandas dataframe)
+    """
+    param = alleles_smoothing_parameters[:-1]
+    if index_smoothing_method  == 1:
+        smoothed_data =  [whittaker_smoother(d, param[0], param[1]) for d in cropped_files]
+    elif index_smoothing_method == 2:
+        smoothed_data =  [sg_filter(d,param[0],param[1]) for d in cropped_files]
+    else: 
+        smoothed_data =  [d for d in cropped_files]
+    return smoothed_data
+
+
+
 def whittaker_smoother(y, lambda_whittaker, degree_whittaker):
     """Smooth data according to Whittaker.
     

@@ -263,81 +263,13 @@ def get_chro_fitness(chrom,cropped_data,file_names,references,replicants,same_sa
         ratio of the variances inter/intra sample (b/w) related to the defined preprocessinbg method 
         defined by the chromosome..
     """
-    smooth_data = perform_smoothing(cropped_data,chrom[0][0],chrom[1][0])
-    smooth_ref = perform_smoothing(references,chrom[0][0],chrom[1][0])
+    smooth_data = smoother.perform_smoothing(cropped_data,chrom[0][0],chrom[1][0])
+    smooth_ref = smoother.perform_smoothing(references,chrom[0][0],chrom[1][0])
     baseline_corrected_data = basecorrecter.perform_baseline(smooth_data,chrom[0][1],chrom[1][1],verbose)
     baseline_corrected_ref = basecorrecter.perform_baseline(smooth_ref,chrom[0][1],chrom[1][1],verbose=False)
-    normal_data = perform_normalization(baseline_corrected_data,chrom[0][2],chrom[1][2],replicants,baseline_corrected_ref)
+    normal_data = normalizer.perform_normalization(baseline_corrected_data,chrom[0][2],chrom[1][2],replicants,baseline_corrected_ref)
     indiv_fitness = evaluate(file_names,normal_data,same_samp,replicants)
     return indiv_fitness
-
-def perform_smoothing(cropped_files,index_smoothing_method,alleles_smoothing_parameters):
-    """Perform the smoothing of the cropped raman spectra using a specific method and parameters).
-
-    Parameters
-    ---------- 
- 
-    cropped_files : array like of pandas dataframe
-        List of the spectra of the raman experiement after cropping (pandas dataframe)
-    
-    index_smoothing_method : int
-        index of the smoothing methods (1rt gene of the chromosome during GA optimization)
-
-    alleles_smoothing_parameters : array like
-        list of all the smoothing methods that are a list of parameters / range of parameter
-
-    Returns
-    -------
-    smoothed_data : array like of pandas dataframe
-        List of the spectra of the raman experiement after smoothing (pandas dataframe)
-    """
-    param = alleles_smoothing_parameters[:-1]
-    if index_smoothing_method  == 1:
-        smoothed_data =  [smoother.whittaker_smoother(d, param[0], param[1]) for d in cropped_files]
-    elif index_smoothing_method == 2:
-        smoothed_data =  [smoother.sg_filter(d,param[0],param[1]) for d in cropped_files]
-    else: 
-        smoothed_data =  [d for d in cropped_files]
-    return smoothed_data
-
-
-def perform_normalization(base_data,index_normalization_method,alleles_normalization_parameters,replicants,references):
-    """Perform the normalization of the raman spectra using a specific method and parameters).
-
-    Parameters
-    ---------- 
- 
-    base_data : array like of pandas dataframe
-        List of the spectra of the raman experiement (pandas dataframe) after cropping 
-        and possibly the smoothing and baseline correction
-    
-    index_normalization_method : int
-        index of the baseline correction methods (2nd gene of the chromosome during GA optimization)
-
-    alleles_nomalization_parameters : array like
-        list of all the normalization methods that are a list of parameters / range of parameter
-
-    replicants : int
-        Number of replication of each sample
-
-    references : pandas dataframe
-        [0] = raman_shift 
-        [1] = intensity cropped the same way than the other raman spectra
-        Reference raman spectra (BlanK)
-
-
-    Returns
-    -------
-    norm_data : array like of pandas dataframe
-        List of the spectra of the raman experiement after normalization (pandas dataframe)
-    """
-    if index_normalization_method == 0:
-        norm_data = [d for d in base_data]
-    elif index_normalization_method  == 1:
-        norm_data = normalizer.msc(base_data,replicants, reference=references)
-    else:
-        norm_data = normalizer.snv(base_data)
-    return norm_data
 
 
 
@@ -351,7 +283,7 @@ def perform_normalization(base_data,index_normalization_method,alleles_normaliza
 
 
 
-def create_next_generation(pop,fit_pop,proba_gen_mut,proba_allele_mut,al_smooth_parameters,al_base_parameters,al_norm_parameters):
+def create_next_generation(pop,fit_pop,proba_gen_mut,proba_allele_mut,al_smooth_parameters,al_base_parameters,al_norm_parameters,pop_elite_size=5):
     """ Create the new generation using an elistim selection / directed crossover reproduction / 
         perform_mutation of the preprocessing methods / perform_mutation of the parameters of the preprocessing methods
 
@@ -382,16 +314,21 @@ def create_next_generation(pop,fit_pop,proba_gen_mut,proba_allele_mut,al_smooth_
     al_normalization_parameters : array like
         list of all the normalization methods that are a list of parameters / range of parameter
     
+     pop_elite_size : int
+        number of chromosome wanted in the population of elitism
+        by default = 5
+    
     Returns
     -------
     next_gen  : array like 
         new population of chromosomes :
-            5 best chromosome's fitness (elitism selection)
-            15 copy of the 5 best chromosome's fitness with probabily parameter of preprocessing perform_mutation
-            10 directed reproduction (6th to 10th best chromosome's fitness // 5 worst chromosome's fitness)
+            pop_elite_size chromosomes with the best fitness value (elitism selection)
+            3 copy of the pop_elite_size  best chromosome's fitness with probabily parameter of preprocessing perform_mutation
+            pop_elite_size directed reproduction chromosomes with the best fitness after the elitism_pop selection value 
+            inside population with the pop_elite_size worst chromosome's fitness
             (probabily preprocessing method / parameter perform_mutation)
     """
-    next_gen_elitism,next_gen_sec,next_gen_noob = perform_elitism_selection(pop,fit_pop)
+    next_gen_elitism,next_gen_sec,next_gen_noob = perform_elitism_selection(pop,fit_pop,pop_elite_size)
     next_gen_cross = copy.deepcopy(next_gen_sec)
     next_gen_worst = copy.deepcopy(next_gen_noob)
     next_gen_elite = copy.deepcopy(next_gen_elitism)
@@ -407,9 +344,9 @@ def create_next_generation(pop,fit_pop,proba_gen_mut,proba_allele_mut,al_smooth_
 
 ### NEXT GENERATION ###
 
-def perform_elitism_selection(pop,fitness,pop_elite_size=5):
-    """Get the chromosomes with respectively the 1th to 5th, 6th to 10th best fitness and the 5 worst fitness
-    from the population
+def perform_elitism_selection(pop,fitness,pop_elite_size):
+    """Get the chromosomes with respectively the 1 to pop_elite_size, pop_elite_size to 2*pop_elite_size 
+    best fitness and the pop_elite_size worst fitness from the population
 
     Parameters
     ----------
@@ -423,7 +360,7 @@ def perform_elitism_selection(pop,fitness,pop_elite_size=5):
         defined by each chromosome inside the population).
 
     pop_elite_size : int
-        number of chromosome wanted in the population of elitis,
+        number of chromosome wanted in the population of elitism
     
     Returns
     -------
@@ -459,30 +396,30 @@ def perform_directed_reproduction(sec_elitism_pop,gen_noob):
     ----------
 
     sec_elitism_pop : array like
-        List of the 5 chromosomes with the 6th to 10th best fitness value inside population
+        List of the chromosomes with the best fitness after the elitism selection value inside population
         A chromosome is a list of 2 elements :
             List of randomly selected index of each preprocessing methods (Smoothing/Baseline/Normalization)
             List of default parameters / range for each preprocessing method (Smoothing/Baseline/Normalization)
 
 
     noob_pop : array like
-        List of the 5 chromosomes with the worst fitness value inside population
+        List of the chromosomes with the worst fitness value inside population
     
     Returns
     -------
-    dir_childs : array like
+    dir_children : array like
         List of a new chromosomes (daughters and sons) from the selected parents chromosome 
         (by a crossover reproduction)
     
     """
-    dir_childs = []
+    dir_children = []
     for i in range(int(len(sec_elitism_pop))):
         father = sec_elitism_pop[i]
         mother = gen_noob[i]
         childs = perform_crossover_param_reproduction(father,mother)
-        childs_ = copy.deepcopy(childs)
-        dir_childs = dir_childs + childs_
-    return dir_childs
+        children = copy.deepcopy(childs)
+        dir_children = dir_children + children
+    return dir_children
 
 
 def perform_crossover_param_reproduction(father,mother):
