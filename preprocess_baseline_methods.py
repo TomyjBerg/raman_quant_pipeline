@@ -8,6 +8,82 @@ import pybaselines.smooth as pysmooth
 from scipy.signal import savgol_filter
 
 
+
+def perform_baseline(smoothed_data,index_baseline_method,alleles_baseline_parameters,verbose):
+    """Perform the baseline of the raman spectra using a specific method and parameters).
+
+    Parameters
+    ---------- 
+ 
+    smoothed_data : array like of pandas dataframe
+        List of the spectra of the raman experiement (pandas dataframe) after cropping 
+        and possibly the smoothing 
+    
+    index_baseline_method : int
+        index of the baseline correction methods (2nd gene of the chromosome during GA optimization)
+
+    alleles_baseline_parameters : array like
+        list of all the smoothing methods that are a list of parameters / range of parameter
+    
+    verbose : Bool
+        if True : Print baseline correction method indexes
+
+    Returns
+    -------
+    base_data : array like of pandas dataframe
+        List of the spectra of the raman experiement after baseline correction (pandas dataframe)
+    """
+    param = alleles_baseline_parameters[:-1]
+    if verbose:
+        print(index_baseline_method)
+    if index_baseline_method== 0:
+        base_data = [d for d in smoothed_data]
+    elif index_baseline_method == 1:
+        base_data =  [perform_baseline_correction(d, param[0], param[1]) for d in smoothed_data]
+    elif index_baseline_method == 2:
+        base_data =  [asls(d, param[0], param[1]) for d in smoothed_data]
+    elif index_baseline_method == 3:
+        base_data =  [airpls(d,param[0]) for d in smoothed_data]
+    elif index_baseline_method == 4:
+        base_data =  [arpls(d,param[0]) for d in smoothed_data]
+    elif index_baseline_method == 5:
+        base_data =  [aspls(d,param[0]) for d in smoothed_data]
+    elif index_baseline_method == 6:
+        base_data =  [drpls(d, param[0], param[1]) for d in smoothed_data]
+    elif index_baseline_method == 7:
+        base_data =  [improved_arpls(d,param[0]) for d in smoothed_data]
+    elif index_baseline_method == 8:
+        base_data =  [improved_asls(d,param[0], param[1],param[2]) for d in smoothed_data]
+    elif index_baseline_method == 9:
+        base_data =  [normal_poly(d,param[0]) for d in smoothed_data]
+    elif index_baseline_method == 10:
+        base_data = [mod_poly(d,param[0]) for d in smoothed_data]
+    elif index_baseline_method == 11:
+        base_data =  [improved_mod_poly(d,param[0]) for d in smoothed_data]
+    elif index_baseline_method == 12:
+        base_data =  [penalized_poly(d,param[0]) for d in smoothed_data]
+    elif index_baseline_method == 13:
+        base_data =  [quantile_poly(d,param[0],param[1]) for d in smoothed_data]
+    elif index_baseline_method == 14:
+        base_data =  [quantile_spline(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
+    elif index_baseline_method == 15:
+        base_data =  [spline_airpls(d,param[0],param[1],param[2]) for d in smoothed_data]
+    elif index_baseline_method == 16:
+        base_data =  [spline_arpls(d,param[0],param[1],param[2]) for d in smoothed_data]
+    elif index_baseline_method == 17:
+        base_data =  [spline_asls(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
+    elif index_baseline_method == 18:
+        base_data =  [improved_spline_arpls(d,param[0],param[1],param[2]) for d in smoothed_data]
+    elif index_baseline_method == 19:
+        base_data =  [improved_spline_asls(d,param[0],param[1],param[2],param[3],param[4]) for d in smoothed_data]
+    elif index_baseline_method == 20:
+        base_data =  [amormol(d,param[0]) for d in smoothed_data]
+    else:
+        base_data =  [snip(d,param[0]) for d in smoothed_data]
+
+    return base_data
+
+
 def perform_baseline_correction(y, lambda_whittaker, penalty_whittaker):
     """Perform baseline correction of data by applying an asymmetric Whittaker smoother
     based on the publication by Eilers and Boelens (2005) described in Ye et al. (2020).

@@ -265,8 +265,8 @@ def get_chro_fitness(chrom,cropped_data,file_names,references,replicants,same_sa
     """
     smooth_data = perform_smoothing(cropped_data,chrom[0][0],chrom[1][0])
     smooth_ref = perform_smoothing(references,chrom[0][0],chrom[1][0])
-    baseline_corrected_data = perform_baseline(smooth_data,chrom[0][1],chrom[1][1],verbose)
-    baseline_corrected_ref = perform_baseline(smooth_ref,chrom[0][1],chrom[1][1],verbose=False)
+    baseline_corrected_data = basecorrecter.perform_baseline(smooth_data,chrom[0][1],chrom[1][1],verbose)
+    baseline_corrected_ref = basecorrecter.perform_baseline(smooth_ref,chrom[0][1],chrom[1][1],verbose=False)
     normal_data = perform_normalization(baseline_corrected_data,chrom[0][2],chrom[1][2],replicants,baseline_corrected_ref)
     indiv_fitness = evaluate(file_names,normal_data,same_samp,replicants)
     return indiv_fitness
@@ -300,79 +300,6 @@ def perform_smoothing(cropped_files,index_smoothing_method,alleles_smoothing_par
         smoothed_data =  [d for d in cropped_files]
     return smoothed_data
 
-def perform_baseline(smoothed_data,index_baseline_method,alleles_baseline_parameters,verbose):
-    """Perform the baseline of the raman spectra using a specific method and parameters).
-
-    Parameters
-    ---------- 
- 
-    smoothed_data : array like of pandas dataframe
-        List of the spectra of the raman experiement (pandas dataframe) after cropping 
-        and possibly the smoothing 
-    
-    index_baseline_method : int
-        index of the baseline correction methods (2nd gene of the chromosome during GA optimization)
-
-    alleles_baseline_parameters : array like
-        list of all the smoothing methods that are a list of parameters / range of parameter
-    
-    verbose : Bool
-        if True : Print baseline correction method indexes
-
-    Returns
-    -------
-    base_data : array like of pandas dataframe
-        List of the spectra of the raman experiement after baseline correction (pandas dataframe)
-    """
-    param = alleles_baseline_parameters[:-1]
-    if verbose:
-        print(index_baseline_method)
-    if index_baseline_method== 0:
-        base_data = [d for d in smoothed_data]
-    elif index_baseline_method == 1:
-        base_data =  [basecorrecter.perform_baseline_correction(d, param[0], param[1]) for d in smoothed_data]
-    elif index_baseline_method == 2:
-        base_data =  [basecorrecter.asls(d, param[0], param[1]) for d in smoothed_data]
-    elif index_baseline_method == 3:
-        base_data =  [basecorrecter.airpls(d,param[0]) for d in smoothed_data]
-    elif index_baseline_method == 4:
-        base_data =  [basecorrecter.arpls(d,param[0]) for d in smoothed_data]
-    elif index_baseline_method == 5:
-        base_data =  [basecorrecter.aspls(d,param[0]) for d in smoothed_data]
-    elif index_baseline_method == 6:
-        base_data =  [basecorrecter.drpls(d, param[0], param[1]) for d in smoothed_data]
-    elif index_baseline_method == 7:
-        base_data =  [basecorrecter.improved_arpls(d,param[0]) for d in smoothed_data]
-    elif index_baseline_method == 8:
-        base_data =  [basecorrecter.improved_asls(d,param[0], param[1],param[2]) for d in smoothed_data]
-    elif index_baseline_method == 9:
-        base_data =  [basecorrecter.normal_poly(d,param[0]) for d in smoothed_data]
-    elif index_baseline_method == 10:
-        base_data = [basecorrecter.mod_poly(d,param[0]) for d in smoothed_data]
-    elif index_baseline_method == 11:
-        base_data =  [basecorrecter.improved_mod_poly(d,param[0]) for d in smoothed_data]
-    elif index_baseline_method == 12:
-        base_data =  [basecorrecter.penalized_poly(d,param[0]) for d in smoothed_data]
-    elif index_baseline_method == 13:
-        base_data =  [basecorrecter.quantile_poly(d,param[0],param[1]) for d in smoothed_data]
-    elif index_baseline_method == 14:
-        base_data =  [basecorrecter.quantile_spline(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
-    elif index_baseline_method == 15:
-        base_data =  [basecorrecter.spline_airpls(d,param[0],param[1],param[2]) for d in smoothed_data]
-    elif index_baseline_method == 16:
-        base_data =  [basecorrecter.spline_arpls(d,param[0],param[1],param[2]) for d in smoothed_data]
-    elif index_baseline_method == 17:
-        base_data =  [basecorrecter.spline_asls(d,param[0],param[1],param[2],param[3]) for d in smoothed_data]
-    elif index_baseline_method == 18:
-        base_data =  [basecorrecter.improved_spline_arpls(d,param[0],param[1],param[2]) for d in smoothed_data]
-    elif index_baseline_method == 19:
-        base_data =  [basecorrecter.improved_spline_asls(d,param[0],param[1],param[2],param[3],param[4]) for d in smoothed_data]
-    elif index_baseline_method == 20:
-        base_data =  [basecorrecter.amormol(d,param[0]) for d in smoothed_data]
-    else:
-        base_data =  [basecorrecter.snip(d,param[0]) for d in smoothed_data]
-
-    return base_data
 
 def perform_normalization(base_data,index_normalization_method,alleles_normalization_parameters,replicants,references):
     """Perform the normalization of the raman spectra using a specific method and parameters).
