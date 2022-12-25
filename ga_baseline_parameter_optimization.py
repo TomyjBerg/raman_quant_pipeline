@@ -6,7 +6,7 @@ from preprocess_fitness import evaluate, calc_best_fitness
 import pandas as pd
 
 
-def mini_ga_param_loop(pop_size,mut_prob,patience_cond,smoothed_data,file_names,baseline_parameters,same_files,replicants,verbose=False):
+def mini_ga_param_loop(pop_size,mut_prob,patience_cond,smoothed_data,file_names,baseline_parameters,same_files,replicants,files_text_path,verbose=False,):
     """ Perform optimization in order to select the best parameters for each baseline correction methods
         along multiple generation using a genetic algorithm with elitism selection and directed reproduction
 
@@ -58,8 +58,17 @@ def mini_ga_param_loop(pop_size,mut_prob,patience_cond,smoothed_data,file_names,
             new_baseline_meth.append(best_base_param)
             if verbose == True:
                 print("baseline")
-                print(f'Baseline : {baseline_idx:.3f}, Best fitness : {fit:.3f}, New_parameters : {best_base_param:.3f}')
+                print(f'Baseline : {baseline_idx}, Best fitness : {fit}, New_parameters : {best_base_param}')
                 print(best_base_param)
+                with open(files_text_path+'_'+str(baseline_idx)+'.txt','w') as f:
+                    f.write(str(fit))
+                    f.write('\n')
+                    f.write('\n')
+                    for list in best_base_param[:-1]:
+                        f.write(str(list))
+                        f.write('\n')
+
+                        
     return new_baseline_meth
 
 
@@ -127,7 +136,7 @@ def mini_GA_param(pop_size,probability_param_mut,patience_cond,smoothed_data,fil
     while patience < patience_cond:
         iter = iter + 1
         x_.append(iter)
-        fit_mini_pop = calc_baseline_pop_fit(pop,smoothed_data,file_names,baseline_methods_param,baseline_param_idx,same_sample,replicants,verbose)
+        fit_mini_pop = calc_baseline_pop_fit(pop,smoothed_data,file_names,baseline_param_idx,same_sample,replicants,verbose)
         best_mini_fit = calc_best_fitness(fit_mini_pop,verbose)
         y_.append(best_mini_fit[0])
         if verbose:
