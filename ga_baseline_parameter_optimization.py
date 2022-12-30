@@ -51,7 +51,7 @@ def mini_ga_param_loop(pop_size,mut_prob,patience_cond,smoothed_data,file_names,
     """
     new_baseline_meth = []
     for baseline_idx in range(len(baseline_parameters)):
-        if baseline_idx == 0 :
+        if baseline_idx != 21 :
             new_baseline_meth.append(baseline_parameters[baseline_idx])
         else:
             fit,best_base_param = mini_GA_param(pop_size,mut_prob,patience_cond,smoothed_data,file_names,baseline_parameters,baseline_idx,same_files,replicants,verbose)

@@ -9,11 +9,13 @@ import copy
 import numpy as np
 
 folder_path = 'C:\\Users\\thoma\\Desktop\\Master Thesis\\Master\\Mile 3\\221107_Bertho01-CDW3'
-delete_experiment = ['0']
-
+#folder_path = 'C:\\Users\\thoma\\Desktop\\Master Thesis\\Master\\ACEGlc_data'
+#folder_path = 'C:\\Users\\thoma\\Desktop\\Master Thesis\\Master\\Mile2\\glucitamodow'
+#delete_experiment = ['01']
+delete_experiment= ['0']
 spectra_files,file_names = get_data.get_spectra_files(folder_path,delete_experiment)
 
-shift_lim = [450, 1550]
+shift_lim = [500, 1800]
 
 cropped_files = [cropper.crop_file(f, shift_lim) for f in spectra_files]
 #smooth_files = [preprocess.crop_file(f, shift_lim) for f in spectra_files]
@@ -22,7 +24,7 @@ cropped_files = [cropper.crop_file(f, shift_lim) for f in spectra_files]
 
 ref_spectra,ref_name = get_data.get_spectra_specific_file(folder_path,['0'])
 cropped_ref = [cropper.crop_file(f, shift_lim) for f in ref_spectra]
-
+#cropped_ref = []
 
 same = ['5','6','11','12','13']
 rep = 10
@@ -36,11 +38,20 @@ alleles_baseline = preprocessparam.get_default_baseline()
 alleles_normaliztaion = preprocessparam.get_default_normalization()
 
 pop_size = 30
-mut_gene = 0.2
-mut_all = 0.5
+mut_gene = 0.4
+mut_all = 0.6
 patience = 10
 
-test_GA = gapro.perform_GA_optimization(pop_size,mut_gene,mut_all,patience,cropped_files,file_names,rep,
+fit,prepross = gapro.perform_GA_optimization(pop_size,mut_gene,mut_all,patience,cropped_files,file_names,rep,
                            cropped_ref,alleles_smoothing,alleles_baseline,alleles_normaliztaion,same,verbose=True)
 
+#files_text_path = 'C:\\Users\\thoma\\Desktop\\Master Thesis\\Master\\ACEGlc_data'
 
+with open(folder_path+'_'+'result_3'+'.txt','w') as f:
+    f.write(str(fit))
+    f.write('\n')
+    f.write('\n')
+    for list in prepross[0]:
+        f.write(str(list))
+        f.write('\n')
+    f.write(str(prepross))

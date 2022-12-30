@@ -123,6 +123,7 @@ def calc_intra_sample_variance(files_names,files):
     return (std/len(name_trip))**2
       
 def calc_inter_variance_sample(files_names,files,same_sample,replicants):
+
     """Calculate the variance within each sample (Variance inter Sample).
 
     Parameters

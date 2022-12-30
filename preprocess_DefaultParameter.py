@@ -41,7 +41,7 @@ def get_default_smoothing():
     SG_filer_order_range = range(2,8)
 
     SG_filter_window_default = 11
-    SG_filter_window_range  = range(9,31,2)
+    SG_filter_window_range  = range(9,51,2)
 
     allele_SG = [SG_filter_order_default,SG_filter_window_default,
     [SG_filer_order_range,SG_filter_window_range]]
@@ -74,9 +74,9 @@ def get_default_baseline():
 
     no_base_allele = [no_baseParam_default,[no_baseParam_range]]
 
-    #### Asymetric Whittaker####
+    #### Asymetric Whittaker 1####
 
-    whittaker_base_lambda_default = 580000
+    whittaker_base_lambda_default = 540000
     whittaker_base_lambda_range = range(60000,600000,20000)
 
     penalty_whittaker_default = 0.075
@@ -85,16 +85,9 @@ def get_default_baseline():
     allele_asymetric_whittaker = [whittaker_base_lambda_default,penalty_whittaker_default,
     [whittaker_base_lambda_range,penalty_whittaker_range]]
 
-    #### AirPLS ####
+    #### AsLs 2####
 
-    lambda_air_default = 900000
-    lambda_air_range  =range(50000,1050000,50000)
-
-    allele_airpls = [lambda_air_default,[lambda_air_range]]
-
-    #### AsLs ####
-
-    lambda_as_default = 850000
+    lambda_as_default = 1000000
     lambda_as_range  =range(50000,1050000,50000)
     
     penalty_as_default= 0.005
@@ -102,22 +95,31 @@ def get_default_baseline():
   
     allele_asls = [lambda_as_default,penalty_as_default,[lambda_as_range,penalty_as_range]]
 
-    #### ArPLs ####
+    #### AirPLS 3####
 
-    lambda_ar_default= 800000
+    lambda_air_default = 50000
+    lambda_air_range  =range(50000,1050000,50000)
+
+    allele_airpls = [lambda_air_default,[lambda_air_range]]
+
+   
+
+    #### ArPLs 4####
+
+    lambda_ar_default= 200000
     lambda_ar_range = range(50000,1050000,50000)
 
     allele_arpls = [lambda_ar_default,[lambda_ar_range]]
 
-    #### AsPLs ####
+    #### AsPLs 5####
 
-    lambda_aspls_default = 65000
+    lambda_aspls_default = 15000
     lambda_aspls_range  =range(5000,105000,5000)
 
 
     allele_aspls = [lambda_aspls_default,[lambda_aspls_range]]
 
-    #### drPLS ####
+    #### drPLS 6####
 
     lambda_dr_default =  100000
     lambda_dr_range = range(5000,105000,5000)
@@ -127,9 +129,9 @@ def get_default_baseline():
 
     allele_drpls = [lambda_dr_default,eta_dr_default,[lambda_dr_range,eta_dr_range]] 
 
-    ####  iarpls ####
+    ####  iarpls 7####
 
-    lamda_iar_default = 20000
+    lamda_iar_default = 5000
     lambda_iar_range = range(5000,105000,5000)
 
 
@@ -137,65 +139,65 @@ def get_default_baseline():
 
     #### iasls ####
     
-    lambda_ias_default = 650000
+    lambda_ias_default = 900000
     lambda_ias_range = range(50000,1050000,50000)
 
-    penalty_ias_default = 4e-2 
+    penalty_ias_default = 4.0e-2 
     penalty_ias_range = np.arange(1e-3,4.1e-2,1e-3)
 
-    lambdaDer1_ias_default = 1e-3
+    lambdaDer1_ias_default = 0.9e-3
     lambdaDer1_ias_range = np.arange(1e-4,2.1e-3,1e-4)
 
     allele_iasls = [lambda_ias_default,penalty_ias_default,lambdaDer1_ias_default,
                     [lambda_ias_range,penalty_ias_range,lambdaDer1_ias_range]]
 
-    ## Normal Polynomial ##
+    ## Normal Polynomial 9##
 
     normpoly_order_default = 3
     normpoly_order_range = range(3,7)
 
     allele_poly_normal = [normpoly_order_default,[normpoly_order_range]]
 
-    ## Modified Polynomial ##
+    ## Modified Polynomial 10##
 
     modpoly_order_default = 3
     modpoly_order_range = range(3,7)
 
     allele_poly_modified = [modpoly_order_default,[modpoly_order_range]]
 
-    ## Improve Modified Polynomial ##
+    ## Improve Modified Polynomial 11##
 
-    imodpoly_order_default = 3
+    imodpoly_order_default = 6
     imodpoly_order_range = range(3,7)
 
     allele_improve_poly_modified= [imodpoly_order_default,[imodpoly_order_range]]
 
-    ## Penalized Polynomial ##
+    ## Penalized Polynomial 12##
 
     penpoly_order_default = 3
     penpoly_order_range  = range(3,7)
 
     allele_poly_penalized = [penpoly_order_default,[penpoly_order_range]]
 
-    ## Qunatile Poly ##
+    ## Quantile Poly 13##
 
     qpoly_order_default = 4
     qpoly_order_range = range(4,8)
 
-    poly_quantile_default = 0.06
+    poly_quantile_default = 0.095
     poly_quantile_range = np.arange(0.005,0.105,0.015)
     
     allele_quantile_poly = [qpoly_order_default,poly_quantile_default,[qpoly_order_range,poly_quantile_range]]
 
-    ## Quantile Spline ##
+    ## Quantile Spline 14##
 
-    lambda_irsqr_default = 3850000
+    lambda_irsqr_default = 50000
     lambda_irsqr_range  =range(50000,1050000,50000)
 
-    quantile_irsqr_default = 0.0025
+    quantile_irsqr_default = 0.09
     quantile_irsqr_range = np.arange(0.005,0.105,0.005)
 
-    knots_irsqr_default = 5
+    knots_irsqr_default = 45
     knots_irsqr_range = range(5,50,5)
 
     spline_deg_irsqr_default = 2
@@ -204,43 +206,26 @@ def get_default_baseline():
     allele_quantile_spline=[lambda_irsqr_default,quantile_irsqr_default,knots_irsqr_default,spline_deg_irsqr_default,
                     [lambda_irsqr_range,quantile_irsqr_range,knots_irsqr_range,spline_deg_irsqr_range]]
 
-    ## Spline AirPLS ##
+    ## Spline AirPLS 15##
     
-    lambda_spline_air_default = 800
+    lambda_spline_air_default = 1500
     lambda_spline_air_range = range(500,1550,50)
 
-    knots_air_default = 40
+    knots_air_default = 10
     knots_air_range = range(10,110,10)
     
-    spline_deg_air_default = 3
+    spline_deg_air_default = 2
     spline_deg_air_range = range(1,4)
 
     allele_spline_airpls=[lambda_spline_air_default,knots_air_default,spline_deg_air_default,
                         [lambda_spline_air_range,knots_air_range,spline_deg_air_range]]
 
-    ## Spline AsLS ##
+    ## Spline ArPLS 16##
 
-    lambda_spline_asls_default = 800
-    lambda_spline_asls_range =range(500,1550,50)
-
-    penaly_spline_asls_default = 0.025
-    penaly_spline_asls_range = np.arange(0.005,0.205,0.005)
-
-    knots_asls_default = 30
-    knots_asls_range = range(10,110,10)
-
-    spline_deg_asls_default = 3
-    spline_deg_asls_range = range(1,4)
-
-    allele_spline_asls=[lambda_spline_asls_default,penaly_spline_asls_default,knots_asls_default,spline_deg_asls_default,
-                    [lambda_spline_asls_range,penaly_spline_asls_range,knots_asls_range,spline_deg_asls_range]]
-
-    ## Spline ArPLS ##
-
-    lambda_spline_arpls_default = 1400
+    lambda_spline_arpls_default = 600
     lambda_spline_arpls_range = range(500,1550,50)
 
-    knots_arpls_default = 10
+    knots_arpls_default = 5
     knots_arpls_range = range(5,110,10)
 
     spline_deg_arpls_default = 1
@@ -249,12 +234,31 @@ def get_default_baseline():
     allele_spline_arpls=[lambda_spline_arpls_default,knots_arpls_default,spline_deg_arpls_default,
                     [lambda_spline_arpls_range,knots_arpls_range,spline_deg_arpls_range]]
 
-    ## Spline improve ArPLS ##
+    ## Spline AsLS 17##
 
-    lambda_spline_iar_default = 1350
+    lambda_spline_asls_default = 850
+    lambda_spline_asls_range =range(500,1550,50)
+
+    penaly_spline_asls_default = 0.070
+    penaly_spline_asls_range = np.arange(0.005,0.205,0.005)
+
+    knots_asls_default = 20
+    knots_asls_range = range(10,110,10)
+
+    spline_deg_asls_default = 2
+    spline_deg_asls_range = range(1,4)
+
+    allele_spline_asls=[lambda_spline_asls_default,penaly_spline_asls_default,knots_asls_default,spline_deg_asls_default,
+                    [lambda_spline_asls_range,penaly_spline_asls_range,knots_asls_range,spline_deg_asls_range]]
+
+   
+
+    ## Spline improve ArPLS 18##
+
+    lambda_spline_iar_default = 1050
     lambda_spline_iar_range  = range(500,1550,50)
 
-    knots_iar_default = 10
+    knots_iar_default = 20
     knots_iar_range = range(5,110,5)
 
     spline_deg_iar_default = 3
@@ -264,15 +268,15 @@ def get_default_baseline():
                             [lambda_spline_iar_range,knots_iar_range,spline_deg_iar_range]]
 
 
-    ## Spline improve AsLS ##
+    ## Spline improve AsLS 19##
     
-    lambda_spline_ias_default = 700
+    lambda_spline_ias_default = 1250
     lambda_spline_ias_range  =range(500,1550,50)
 
-    penalty_spline_ias_default = 0.095
-    penalty_spline_ias_range = np.arange(0.005,0.205,0.005)
+    penalty_spline_ias_default = 0.16
+    penalty_spline_ias_range = np.arange(0.005,0.305,0.005)
 
-    lambdaDer1_spline_ias_default = 0.01
+    lambdaDer1_spline_ias_default = 0.007
     lambdaDer1_spline_ias_range = np.arange(0.0005,0.0105,0.0005)
 
     knots_ias_default = 30
@@ -285,17 +289,17 @@ def get_default_baseline():
                                 knots_ias_default,spline_deg_ias_default,[lambda_spline_ias_range,penalty_spline_ias_range,
                                 lambdaDer1_spline_ias_range,knots_ias_range,spline_deg_ias_range]]
 
-    ## AmorMol ##
+    ## AmorMol 20##
 
-    half_window_amormol_default = 29
-    half_window_amormol_range = range(17,51,2)
+    half_window_amormol_default = 11
+    half_window_amormol_range = range(11,101,2)
 
     allele_amormol = [half_window_amormol_default,[half_window_amormol_range]]
 
-    ## SNIP ##
+    ## SNIP 21##
 
-    max_half_window_snip_default = 29
-    max_half_window_snip_range = range(17,51,2)
+    max_half_window_snip_default = 99
+    max_half_window_snip_range = range(11,141,2)
 
 
     allele_snip= [max_half_window_snip_default,[max_half_window_snip_range]]
