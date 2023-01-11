@@ -12,7 +12,7 @@ folder_path = 'C:\\Users\\thoma\\Desktop\\Master Thesis\\Master\\Mile 3\\221107_
 #folder_path = 'C:\\Users\\thoma\\Desktop\\Master Thesis\\Master\\ACEGlc_data'
 #folder_path = 'C:\\Users\\thoma\\Desktop\\Master Thesis\\Master\\Mile2\\glucitamodow'
 #delete_experiment = ['01']
-delete_experiment= ['0']
+delete_experiment= []
 spectra_files,file_names = get_data.get_spectra_files(folder_path,delete_experiment)
 
 shift_lim = [500, 1800]
@@ -27,6 +27,8 @@ cropped_ref = [cropper.crop_file(f, shift_lim) for f in ref_spectra]
 #cropped_ref = []
 
 same = ['5','6','11','12','13']
+#same = ['10','17','18','19B','19C','20B','20C','21B','21C','22B','22C','23B','23C','24B','24C']
+#same = ['6','7']
 rep = 10
 
 ev_test = gapro.evaluate(file_names,cropped_files,same,rep)
@@ -38,7 +40,7 @@ alleles_baseline = preprocessparam.get_default_baseline()
 alleles_normaliztaion = preprocessparam.get_default_normalization()
 
 pop_size = 30
-mut_gene = 0.4
+mut_gene = 0.5
 mut_all = 0.6
 patience = 10
 

@@ -118,7 +118,7 @@ def calc_intra_sample_variance(files_names,files):
         principalComponents = pca.fit_transform(df)
         principalDf = pd.DataFrame(data = principalComponents
                     , columns = ['principal component 1', 'principal component 2','principal component 3'])
-        std = std + principalDf.std()['principal component 1'] + principalDf.std()['principal component 2'] + principalDf.std()['principal component 3']
+        std = std + (principalDf.std()['principal component 1'] + principalDf.std()['principal component 2'])
 
     return (std/len(name_trip))**2
       
@@ -187,7 +187,7 @@ def calc_inter_variance_sample(files_names,files,same_sample,replicants):
         principalComponents = pca.fit_transform(df)
         principalDf = pd.DataFrame(data = principalComponents
                     , columns = ['principal component 1', 'principal component 2','principal component 3'])
-        std = std + principalDf.std()['principal component 1'] + principalDf.std()['principal component 2'] + principalDf.std()['principal component 3']
-  
-    return (std/3)**2
+        std = std + (principalDf.std()['principal component 1'] + principalDf.std()['principal component 2'])
+        
+    return (std/replicants)**2
       

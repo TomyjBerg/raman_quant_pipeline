@@ -13,7 +13,7 @@ import numpy as np
 #folder_path = 'C:\\Users\\thoma\\Desktop\\Master Thesis\\Master\\Mile2\\glucitamodow'
 folder_path = 'C:\\Users\\thoma\\Desktop\\Master Thesis\\Master\\Mile 3\\221107_Bertho01-CDW3'
 
-delete_experiment = ['0']
+delete_experiment = []
 #delete_experiment = []
 
 spectra_files,file_names = get_data.get_spectra_files(folder_path,delete_experiment)
@@ -25,11 +25,12 @@ for i in range(len(spectra_files)):
 shift_lim = [500, 1800]
 
 cropped_files = [cropper.crop_file(f, shift_lim) for f in spectra_files]
-smooth_files = [smoother.whittaker_smoother(f,19000, 3) for f in cropped_files]
+smooth_files = [smoother.sg_filter(f,2, 49) for f in cropped_files]
 
 
-
+#same = ['10','17','18']
 same = ['5','6','11','12','13']
+#same = ['6','7']
 rep = 10
 
 

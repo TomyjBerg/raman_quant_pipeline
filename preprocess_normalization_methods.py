@@ -35,8 +35,10 @@ def perform_normalization(base_data,index_normalization_method,alleles_normaliza
     if index_normalization_method == 0:
         norm_data = [d for d in base_data]
     elif index_normalization_method  == 1:
+        #norm_data = [d for d in base_data]
         norm_data = msc(base_data,replicants, reference=references)
     else:
+        #norm_data = [d for d in base_data]
         norm_data = snv(base_data)
     return norm_data
 
