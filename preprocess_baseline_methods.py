@@ -39,7 +39,7 @@ def perform_baseline(smoothed_data,index_baseline_method,alleles_baseline_parame
     if index_baseline_method== 0:
         base_data = [d for d in smoothed_data]
     elif index_baseline_method == 1:
-        base_data =  [perform_baseline_correction(d, param[0], param[1]) for d in smoothed_data]
+        base_data =  [asymetric_whittaker(d, param[0], param[1]) for d in smoothed_data]
     elif index_baseline_method == 2:
         base_data =  [asls(d, param[0], param[1]) for d in smoothed_data]
     elif index_baseline_method == 3:
@@ -84,7 +84,7 @@ def perform_baseline(smoothed_data,index_baseline_method,alleles_baseline_parame
     return base_data
 
 
-def perform_baseline_correction(y, lambda_whittaker, penalty_whittaker):
+def asymetric_whittaker(y, lambda_whittaker, penalty_whittaker):
     """Perform baseline correction of data by applying an asymmetric Whittaker smoother
     based on the publication by Eilers and Boelens (2005) described in Ye et al. (2020).
     
