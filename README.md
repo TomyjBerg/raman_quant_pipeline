@@ -33,26 +33,40 @@ In order to train the gentic algorithm and the fitenss functions 3 examples file
 
 * example_miniga_baseline_param.py : Allow to optimized the parameters of each baseline corrections methods from a dataset using a the "mini-ga"
 
-Finally regarding the creation of the models to predict the concentration of the target of the interest in the samples using the raman spectra a notebook was added.
+Finally regarding the creation of the models to predict the concentration of the target of the interest in the samples using the raman spectra 3 notebook were added.
 
-* The "GlucoseCitricAcidAmmoniumChlorideYAL_models.ipynb" is the notebook used for the "Glucose, Citric Acid and water in YAL Media experiment" to vizualize the dataset and to build the PLS and CNN model used to predict the target of interest's concentration in the Design of experiment on from the bioprocess sample.
+* The "GlucoseAcetateWater.ipynb" is the notebook used for the "Glucose, Acetate in Water experiment" to vizualize the dataset and to build the PLS and CNN model used to predict the target of interest's concentration in the Design of experiment on from the bioprocess sample.
+
+* The "GlucoseCitricAcidAmmoniumChlorideYAL_models.ipynb" is the notebook used for the "Glucose, Citric Acid and Ammonium Chloride in YAL Media experiment" to vizualize the dataset and to build the PLS and CNN model used to predict the target of interest's concentration in the Design of experiment on from the bioprocess sample.
+
+* The "CDWFatYAL.ipynb" is the notebook used for the "Cell dry weight and fat in YAL Media experiment" to vizualize the dataset and to build the PLS and CNN model used to predict the target of interest's concentration in the Design of experiment on from the bioprocess sample.
+
 
 To used the functions and notebook the following files will hep to test the algorithms :
 
+* Water_Ace_Glu.xlsx is the measurement files with the real cocnentration of the target components samples and the measurements_names for the "Glucose and Acetate in Water Experiment".
+
 * Medium_Glu_Cit_AC_doe3.xlsx is the measurement files with the real cocnentration of the target components samples and the measurements_names for the "Glucose, Citric Acid and Ammonium Chloride in YAL Experiment".
+
+* Medium_Cdw_fat.xlsx is the measurement files with the real cocnentration of the target components samples and the measurements_names for the "CDW and Fat in YAL Experiment".
+
 
 * Real_Measure.xlsx is the measurement files with the bioprocess real concentration of the target components samples and the measurements_names
 
-* Export_2D_GluCitAmo is the folder that conatins all teh replicates in 2D of the raman spectra data related to the "Glucose, Citric and Ammmonium chloride in YAL experiment".
-
-* Bioprocess is the folder that conatins all teh replicates in 2D of the raman spectra data related to the Bioprocess samples.
+* Real_Measure_fat.xlsx is the measurement files with the bioprocess real concentration of the fat component and the measurements_names
 
 
-Next Step : More Notebooks and data folder will come soon to test the data over the "Glcuose and Acetate in water experiment" and the "Cell_dry_weight and Fat in YAL experiment"
+The Following folder contained the raw raman spectra used for those previous notebooks
+
+* Export_2D_GluAce is the folder that contains all the replicates in 2D of the raman spectra data related to the "Glucose and Acetate in Water experiment".
+
+* Export_2D_GluCitAmo is the folder that contains all the replicates in 2D of the raman spectra data related to the "Glucose, Citric and Ammmonium chloride in YAL experiment".
+
+* Export_2D_CDWFat is the folder that contains all the replicates in 2D of the raman spectra data related to the "CDW and Fat in YAL experiment".
+
+* Bioprocess_2D is the folder that contains all the replicates in 2D of the raman spectra data related to the Bioprocess samples.
+
+* Oil_Measurment_Bioprocess_2D is the folder that contains all the replicates in 2D of the raman spectra data for the bioprocess sample with a known Fat concentration
 
 
-
-
-
-Concerning the models building a 
 
